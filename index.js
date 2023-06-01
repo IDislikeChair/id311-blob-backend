@@ -1,14 +1,23 @@
 import express from 'express';
 import { Server } from 'socket.io';
 import http from 'http';
+import cors from 'cors';
 
 const app = express();
 
 // Create an HTTP server
 const server = http.createServer(app);
 
+// Enable CORS
+app.use(cors());
+
 // Initialize Socket.io
-const io = new Server(server);
+const io = new Server(server, {
+  cors: {
+    origin: '*',
+    methods: ['GET', 'POST'],
+  },
+});
 
 io.on('connection', (socket) => {
   console.log('A new client has connected.');
