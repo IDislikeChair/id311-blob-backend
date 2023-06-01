@@ -5,6 +5,8 @@ import cors from 'cors';
 
 const app = express();
 
+let pingCount = 0;
+
 // Create an HTTP server
 const server = http.createServer(app);
 
@@ -25,9 +27,25 @@ io.on('connection', (socket) => {
   socket.emit('message', 'Connected to server');
 
   socket.on('message', (message) => {
-    if (message == 'ping') {
-      socket.emit('message', 'pong');
-    }
+    console.log('message');
+  });
+
+  socket.on('ping', () => {
+    socket.emit('message', 'pong');
+
+    pingCount++;
+
+    socket.emit('broadcastPingCount', pingCount);
+  });
+
+  socket.on('getPingCount', () => {
+    return pingCount;
+  });
+
+  socket.on('resetPingCount', () => {
+    pingCount = 0;
+
+    socket.emit('broadcastPingCount', pingCount);
   });
 
   socket.on('disconnect', () => {
