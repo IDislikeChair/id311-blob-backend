@@ -35,7 +35,7 @@ io.on('connection', (socket) => {
 
     pingCount++;
 
-    socket.broadcast.emit('broadcastPingCount', pingCount);
+    io.emit('broadcastPingCount', pingCount);
   });
 
   socket.on('getPingCount', () => {
@@ -45,7 +45,7 @@ io.on('connection', (socket) => {
   socket.on('resetPingCount', () => {
     pingCount = 0;
 
-    socket.broadcast.emit('broadcastPingCount', pingCount);
+    io.emit('broadcastPingCount', pingCount);
   });
 
   socket.on('disconnect', () => {
