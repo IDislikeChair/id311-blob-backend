@@ -1,6 +1,6 @@
-import { Client } from './client';
-import { PlayerStatus } from './enum';
-import { PlayerMgr } from './playerMgr';
+import { Client } from './client.js';
+import { PlayerStatus } from './enum.js';
+import { PlayerMgr } from './playerMgr.js';
 
 export class Player {
   /** @type {Client} */
@@ -42,6 +42,17 @@ export class Player {
     return this.#get_socket().emit('get_status');
   }
 
+  start_pre_mission(mission_id) {
+    // First check if player is idling.
+    if (this.get_status() !== PlayerStatus.IDLE) {
+      throw new Error('Player is not idling.');
+    }
+
+    this.#get_socket().emit('start_pre_mission', {
+      mission_id,
+    });
+  }
+
   /**
    * @param {number} mission_id
    * @param {number} end_timestamp
@@ -56,6 +67,28 @@ export class Player {
       mission_id,
       end_timestamp,
     });
+  }
+
+  start_post_mission(mission_id) {
+    // Force mission to end.
+    this.#get_socket().emit('start_post_mission', {
+      mission_id,
+    });
+  }
+
+  get_mission_result(mission_id) {
+    // request the result by emit get_mission_result
+    return this.#get_socket().emit('get_mission_result', {
+      mission_id,
+    });
+  }
+
+  start_end_screen() {
+    this.#get_socket().emit('start_end_screen');
+  }
+
+  end_session() {
+    this.#get_socket().disconnect();
   }
 
   set_idle() {

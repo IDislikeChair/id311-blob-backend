@@ -1,4 +1,4 @@
-import { Session } from './session';
+import { Session } from './session.js';
 
 const SESSION_ID_MIN = 1000;
 const SESSION_ID_MAX = 9999;
@@ -13,10 +13,22 @@ export class SessionMgr {
 
   // Public methods
 
+  /**
+   * @returns {Session}
+   */
   create_new_session() {
     const id = this.#get_new_random_id();
     const session = new Session(this, id);
     this.#sessions.set(id, session);
+    return session;
+  }
+
+  /**
+   * @param {number} id
+   * @returns {Session | undefined}
+   */
+  get_session_by_id(id) {
+    return this.#sessions.get(id);
   }
 
   /**

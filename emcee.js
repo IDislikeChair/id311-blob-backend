@@ -1,5 +1,5 @@
-import { Client } from './client';
-import { Session } from './session';
+import { Client } from './client.js';
+import { Session } from './session.js';
 
 export class Emcee {
   /** @type {Client} */
@@ -15,6 +15,8 @@ export class Emcee {
   constructor(client, session) {
     this.client = client;
     this.client.setOwner(this);
+
+    this.client.socket.on('on_next', this.#session.on_next);
 
     this.#session = session;
   }
