@@ -33,21 +33,28 @@ io.on('connection', (socket) => {
   socket.emit('choose_role');
 
   socket.on('join_as', (role, id, name) => {
+    console.log(role);
     switch (role) {
       case 0:
         const emcee = new Client(socket);
         const new_session = session_mgr.create_new_session();
         new_session.add_client_as_emcee(emcee);
-        socket.emit('success_join_as_emcee');
+        socket.removeAllListeners('join_as');
+        socket.emit('success_join_as_emcee', new_session.get_session_id());
+        break;
       case 1:
         const player = new Client(socket);
         const session = session_mgr.get_session_by_id(id);
         if (session) {
-          socket.emit('success_join_as_player');
           session.add_client_as_player(player, name);
+          socket.removeAllListeners('join_as');
+          socket.emit('success_join_as_player');
         } else {
           socket.emit('error_session_not_found');
         }
+        break;
+      default:
+        socket.emit('error_invalid_role');
     }
   });
 });

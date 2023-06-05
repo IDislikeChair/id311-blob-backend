@@ -16,8 +16,6 @@ export class Emcee {
     this.client = client;
     this.client.setOwner(this);
 
-    this.client.socket.on('on_next', this.#session.on_next);
-
     this.#session = session;
   }
 
