@@ -5,7 +5,7 @@ import cors from 'cors';
 
 const app = express();
 
-let pingCount = 0;
+let stepCount = 0;
 
 // Create an HTTP server
 const server = http.createServer(app);
@@ -30,22 +30,20 @@ io.on('connection', (socket) => {
     console.log('message');
   });
 
-  socket.on('ping', () => {
-    socket.emit('message', 'pong');
-
-    pingCount++;
-
-    io.emit('broadcastPingCount', pingCount);
+  socket.on('stepOn', () => {
+    stepCount += 1;
+    io.emit('broadcastStepCount', stepCount);
   });
 
-  socket.on('getPingCount', () => {
-    return pingCount;
+  socket.on('getStepCount', () => {
+    return stepCount;
   });
 
-  socket.on('resetPingCount', () => {
-    pingCount = 0;
+  socket.on('resetStepCount', () => {
+    console.log('resetStepCount');
+    stepCount = 0;
 
-    io.emit('broadcastPingCount', pingCount);
+    io.emit('broadcastStepCount', stepCount);
   });
 
   socket.on('disconnect', () => {
