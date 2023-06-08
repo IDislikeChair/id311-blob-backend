@@ -4,7 +4,7 @@ const SESSION_ID_MIN = 1000;
 const SESSION_ID_MAX = 9999;
 
 export class SessionMgr {
-  /** @type {Map<Number, Session>} */
+  /** @type {Map<number, Session>} */
   #sessions;
 
   constructor() {
@@ -20,6 +20,7 @@ export class SessionMgr {
     const id = this.#get_new_random_id();
     const session = new Session(this, id);
     this.#sessions.set(id, session);
+    console.log(this.#sessions);
     return session;
   }
 
@@ -28,6 +29,7 @@ export class SessionMgr {
    * @returns {Session | undefined}
    */
   get_session_by_id(id) {
+    console.log(this.#sessions);
     return this.#sessions.get(id);
   }
 

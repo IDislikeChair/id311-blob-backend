@@ -42,9 +42,14 @@ export class Session {
    * @param {Client} client
    */
   add_client_as_emcee(client) {
-    const emcee = new Emcee(client, this);
     this.#emcee = new Emcee(client, this);
-    client.socket.emit('success_join_as_emcee');
+
+    // TODO: Move this responsibility to Emcee class
+    this.#emcee.client.on('get_session_id', () => {
+      this.#emcee.client.emit('post_session_id', this.#id);
+    });
+
+    client.emit('success_join_as_emcee');
   }
 
   /**
@@ -53,17 +58,17 @@ export class Session {
    */
   add_client_as_player(client, name) {
     if (!this.#player_mgr.is_name_unused(name)) {
-      client.socket.emit('error_name_taken');
+      client.emit('error', 'error_name_taken');
     } else {
+      client.emit('success_join_as_player');
       const player = new Player(client, name, this.#player_mgr);
       this.#player_mgr.add_player(player);
-      client.socket.emit('success_join_as_player');
     }
   }
 
   end_session() {
     // TODO: Move this responsibility to Emcee class
-    this.#emcee.client.socket.disconnect();
+    this.#emcee.client.disconnect();
     this.#player_mgr.end_session();
   }
 
@@ -76,7 +81,7 @@ export class Session {
    */
   start_pre_mission(mission_id) {
     // TODO: Move this responsibility to Emcee class
-    this.#emcee.client.socket.emit('start_pre_mission', {
+    this.#emcee.client.emit('start_pre_mission', {
       mission_id,
     });
 
@@ -89,7 +94,7 @@ export class Session {
    */
   start_mission(mission_id, duration) {
     // TODO: Move this responsibility to Emcee class
-    this.#emcee.client.socket.emit('start_mission', {
+    this.#emcee.client.emit('start_mission', {
       mission_id,
       end_timestamp: Date.now() + duration,
     });
@@ -103,17 +108,17 @@ export class Session {
    */
   start_post_mission_and_resolve_results(mission_id, result_resolver) {
     // TODO: Move this responsibility to Emcee class
-    this.#emcee.client.socket.emit('start_post_mission', {
+    this.#player_mgr.resolve_results(mission_id, result_resolver);
+    this.#emcee.client.emit('start_post_mission', {
       mission_id,
     });
 
     this.#player_mgr.start_post_mission(mission_id);
-    this.#player_mgr.resolve_results(mission_id, result_resolver);
   }
 
   start_end_screen() {
     // TODO: Move this responsibility to Emcee class
-    this.#emcee.client.socket.emit('start_end_screen');
+    this.#emcee.client.emit('start_end_screen');
 
     this.#player_mgr.start_end_screen();
   }
