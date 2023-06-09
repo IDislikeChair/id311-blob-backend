@@ -6,6 +6,7 @@ import cors from 'cors';
 const app = express();
 
 let stepCount = 0;
+let curBallPos = 0;
 
 // Create an HTTP server
 const server = http.createServer(app);
@@ -30,8 +31,8 @@ io.on('connection', (socket) => {
     console.log('message');
   });
 
-  socket.on('stepOn', () => {
-    stepCount += 1;
+  socket.on('stepOn', (steps) => {
+    stepCount = steps;
     io.emit('broadcastStepCount', stepCount);
   });
 
@@ -40,10 +41,24 @@ io.on('connection', (socket) => {
   });
 
   socket.on('resetStepCount', () => {
-    console.log('resetStepCount');
     stepCount = 0;
 
     io.emit('broadcastStepCount', stepCount);
+  });
+
+  socket.on('tilt', (amount) => {
+    console.log('tilt', amount);
+    curBallPos += amount;
+    if (curBallPos < 0) curBallPos = 0;
+    else if (curBallPos > 300) curBallPos = 300;
+    io.emit('broadcastBallPos', curBallPos);
+  });
+
+  socket.on('resetBallPos', () => {
+    console.log('resetBallPos');
+    curBallPos = 150;
+
+    io.emit('broadcastBallPos', curBallPos);
   });
 
   socket.on('disconnect', () => {
