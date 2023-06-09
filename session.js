@@ -1,8 +1,9 @@
-import { Client } from './client';
-import { Emcee } from './emcee';
-import { Player } from './player';
-import { PlayerMgr } from './playerMgr';
-import { SessionMgr } from './sessionMgr';
+import { Client } from './client.js';
+import { Emcee } from './emcee.js';
+import { GameFlowMgr } from './gameFlowMgr.js';
+import { Player } from './player.js';
+import { PlayerMgr } from './playerMgr.js';
+import { SessionMgr } from './sessionMgr.js';
 
 export class Session {
   /** @type {SessionMgr} */
@@ -22,6 +23,9 @@ export class Session {
   /** @type {PlayerMgr} */
   #player_mgr;
 
+  /** @type {GameFlowMgr} */
+  #game_flow_mgr;
+
   /**
    * @param {SessionMgr} session_mgr
    * @param {number} id
@@ -30,6 +34,7 @@ export class Session {
     this.#session_mgr = session_mgr;
     this.#id = id;
     this.#player_mgr = new PlayerMgr();
+    this.#game_flow_mgr = new GameFlowMgr(this);
   }
 
   // Public methods
@@ -37,9 +42,14 @@ export class Session {
    * @param {Client} client
    */
   add_client_as_emcee(client) {
-    const emcee = new Emcee(client, this);
     this.#emcee = new Emcee(client, this);
-    client.socket.emit('success_join_as_emcee');
+
+    // TODO: Move this responsibility to Emcee class
+    this.#emcee.client.on('get_session_id', () => {
+      this.#emcee.client.emit('post_session_id', this.#id);
+    });
+
+    client.emit('success_join_as_emcee');
   }
 
   /**
@@ -48,20 +58,72 @@ export class Session {
    */
   add_client_as_player(client, name) {
     if (!this.#player_mgr.is_name_unused(name)) {
-      client.socket.emit('error_name_taken');
+      client.emit('error', 'error_name_taken');
     } else {
+      client.emit('success_join_as_player');
       const player = new Player(client, name, this.#player_mgr);
       this.#player_mgr.add_player(player);
-      client.socket.emit('success_join_as_player');
     }
   }
 
   end_session() {
-    this.#emcee.client.socket.emit('end_session');
-    this.#player_mgr.emit_to_all_players('end_session');
+    // TODO: Move this responsibility to Emcee class
+    this.#emcee.client.disconnect();
+    this.#player_mgr.end_session();
   }
 
   on_emcee_disconnect() {
     this.end_session();
+  }
+
+  /**
+   * @param {number} mission_id
+   */
+  start_pre_mission(mission_id) {
+    // TODO: Move this responsibility to Emcee class
+    this.#emcee.client.emit('start_pre_mission', {
+      mission_id,
+    });
+
+    this.#player_mgr.start_pre_mission(mission_id);
+  }
+
+  /**
+   * @param {number} mission_id
+   * @param {number} duration
+   */
+  start_mission(mission_id, duration) {
+    // TODO: Move this responsibility to Emcee class
+    this.#emcee.client.emit('start_mission', {
+      mission_id,
+      end_timestamp: Date.now() + duration,
+    });
+
+    this.#player_mgr.start_mission(mission_id, duration);
+  }
+
+  /**
+   * @param {number} mission_id
+   * @param {function(Map<Player, Object>): Map<Player, boolean>} result_resolver
+   */
+  start_post_mission_and_resolve_results(mission_id, result_resolver) {
+    // TODO: Move this responsibility to Emcee class
+    this.#player_mgr.resolve_results(mission_id, result_resolver);
+    this.#emcee.client.emit('start_post_mission', {
+      mission_id,
+    });
+
+    this.#player_mgr.start_post_mission(mission_id);
+  }
+
+  start_end_screen() {
+    // TODO: Move this responsibility to Emcee class
+    this.#emcee.client.emit('start_end_screen');
+
+    this.#player_mgr.start_end_screen();
+  }
+
+  on_next() {
+    this.#game_flow_mgr.on_next();
   }
 }

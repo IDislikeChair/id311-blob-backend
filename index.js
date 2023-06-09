@@ -1,70 +1,42 @@
-import express from 'express';
-import { Server } from 'socket.io';
-import http from 'http';
-import cors from 'cors';
+import { SessionMgr } from './sessionMgr.js';
+import { Client } from './client.js';
+import SOCKET_MGR from './socketMgr.js';
 
-const app = express();
+const session_mgr = new SessionMgr();
 
-let stepCount = 0;
-let curBallPos = 0;
+SOCKET_MGR.get_io().on('connection', (socket) => {
+  console.log('A new client has connected.' + socket.id);
 
-// Create an HTTP server
-const server = http.createServer(app);
+  socket.on('message', (message) => console.log(message));
 
-// Enable CORS
-app.use(cors());
+  socket.on('join_as', (o) => {
+    console.log('join as: ' + o);
+    switch (o.role) {
+      case 0:
+        const emcee = new Client(socket.id);
 
-// Initialize Socket.io
-const io = new Server(server, {
-  cors: {
-    origin: '*',
-    methods: ['GET', 'POST'],
-  },
-});
+        const new_session = session_mgr.create_new_session();
+        new_session.add_client_as_emcee(emcee);
 
-io.on('connection', (socket) => {
-  console.log('A new client has connected.');
+        socket.removeAllListeners('join_as');
+        socket.emit('success_join_as_emcee', new_session.get_session_id());
+        break;
+      case 1:
+        const player = new Client(socket.id);
 
-  socket.emit('message', 'Connected to server');
-
-  socket.on('message', (message) => {
-    console.log('message');
-  });
-
-  socket.on('stepOn', (steps) => {
-    stepCount = steps;
-    io.emit('broadcastStepCount', stepCount);
-  });
-
-  socket.on('getStepCount', () => {
-    return stepCount;
-  });
-
-  socket.on('resetStepCount', () => {
-    stepCount = 0;
-
-    io.emit('broadcastStepCount', stepCount);
-  });
-
-  socket.on('tilt', (amount) => {
-    console.log('tilt', amount);
-    curBallPos += amount;
-    if (curBallPos < 0) curBallPos = 0;
-    else if (curBallPos > 300) curBallPos = 300;
-    io.emit('broadcastBallPos', curBallPos);
-  });
-
-  socket.on('resetBallPos', () => {
-    console.log('resetBallPos');
-    curBallPos = 150;
-
-    io.emit('broadcastBallPos', curBallPos);
-  });
-
-  socket.on('disconnect', () => {
-    console.log('A client has disconnected.');
+        const session = session_mgr.get_session_by_id(
+          parseInt(o['session_id'])
+        );
+        if (session) {
+          session.add_client_as_player(player, o['player_name']);
+          socket.removeAllListeners('join_as');
+          socket.emit('success_join_as_player');
+        } else {
+          socket.emit('error', 'error_session_not_found');
+        }
+        break;
+      default:
+        socket.emit('error', 'error_invalid_role');
+    }
   });
 });
-
-const port = process.env.PORT || 3000;
-server.listen(port, () => console.log(`Listening on port ${port}`));

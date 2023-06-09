@@ -1,5 +1,5 @@
-import { Client } from './client';
-import { Session } from './session';
+import { Client } from './client.js';
+import { Session } from './session.js';
 
 export class Emcee {
   /** @type {Client} */
