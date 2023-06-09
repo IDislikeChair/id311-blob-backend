@@ -3,7 +3,7 @@ import { Session } from './session.js';
 
 export class Emcee {
   /** @type {Client} */
-  client;
+  #client;
 
   /** @type {Session} */
   #session;
@@ -13,8 +13,8 @@ export class Emcee {
    * @param {Session} session
    */
   constructor(client, session) {
-    this.client = client;
-    this.client.setOwner(this);
+    this.#client = client;
+    this.#client.setOwner(this);
 
     this.#session = session;
   }
@@ -29,7 +29,7 @@ export class Emcee {
    * @param {any[]} args
    */
   emit(event, ...args) {
-    this.client.emit(event, ...args);
+    this.#client.emit(event, ...args);
   }
 
   /**
@@ -37,6 +37,10 @@ export class Emcee {
    * @param {any} callback
    */
   on(event, callback) {
-    this.client.on(event, callback);
+    this.#client.on(event, callback);
+  }
+
+  disconnect() {
+    this.#client.disconnect();
   }
 }
