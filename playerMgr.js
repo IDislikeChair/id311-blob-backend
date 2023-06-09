@@ -138,4 +138,38 @@ export class PlayerMgr {
       }
     }
   }
+
+  /**
+   * @param {number} player_number
+   * @param {any} event
+   * @param {any[]} args
+   */
+  emit_to_player(player_number, event, ...args) {
+    if (player_number > 5)
+      console.warn(
+        `playerMgr.emit_to_player: player_number ${player_number} is more than 5`
+      );
+
+    const player = this.#players[player_number];
+    if (player) {
+      player.emit(event, ...args);
+    }
+  }
+
+  /**
+   * @param {number} player_number
+   * @param {any} event
+   * @param {any} callback
+   */
+  on_player(player_number, event, callback) {
+    if (player_number > 5)
+      console.warn(
+        `playerMgr.on_player: player_number ${player_number} is more than 5`
+      );
+
+    const player = this.#players[player_number];
+    if (player) {
+      player.on(event, callback);
+    }
+  }
 }
