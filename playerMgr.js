@@ -105,9 +105,37 @@ export class PlayerMgr {
     }
   }
 
+  /**
+   * @param {any} event
+   * @param {any} callback
+   */
   on_any_player(event, callback) {
     for (const player of this.#players) {
       player.on(event, callback);
+    }
+  }
+
+  /**
+   * @param {any} event
+   * @param {any[]} args
+   */
+  emit_to_alive_players(event, ...args) {
+    for (const player of this.#players) {
+      if (player.is_alive) {
+        player.emit(event, ...args);
+      }
+    }
+  }
+
+  /**
+   * @param {any} event
+   * @param {any} callback
+   */
+  on_any_alive_player(event, callback) {
+    for (const player of this.#players) {
+      if (player.is_alive) {
+        player.on(event, callback);
+      }
     }
   }
 }
