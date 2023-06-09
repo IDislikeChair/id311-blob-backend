@@ -41,6 +41,13 @@ export class Session {
   #game_flow_mgr;
 
   /**
+   * @returns {GameFlowMgr}
+   */
+  get_game_flow_mgr() {
+    return this.#game_flow_mgr;
+  }
+
+  /**
    * @param {SessionMgr} session_mgr
    * @param {number} id
    */
