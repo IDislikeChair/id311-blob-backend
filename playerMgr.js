@@ -94,4 +94,20 @@ export class PlayerMgr {
   remove_player(player) {
     this.#players = this.#players.filter((p) => p !== player);
   }
+
+  /**
+   * @param {any} event
+   * @param {any[]} args
+   */
+  emit_to_all_players(event, ...args) {
+    for (const player of this.#players) {
+      player.emit(event, ...args);
+    }
+  }
+
+  on_any_player(event, callback) {
+    for (const player of this.#players) {
+      player.on(event, callback);
+    }
+  }
 }

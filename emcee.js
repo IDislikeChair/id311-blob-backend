@@ -23,4 +23,20 @@ export class Emcee {
   on_client_disconnect() {
     this.#session.on_emcee_disconnect();
   }
+
+  /**
+   * @param {any} event
+   * @param {any[]} args
+   */
+  emit(event, ...args) {
+    this.client.emit(event, ...args);
+  }
+
+  /**
+   * @param {any} event
+   * @param {any} callback
+   */
+  on(event, callback) {
+    this.client.on(event, callback);
+  }
 }
