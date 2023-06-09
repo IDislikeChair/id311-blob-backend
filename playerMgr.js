@@ -96,6 +96,13 @@ export class PlayerMgr {
   }
 
   /**
+   * @param {string | number} player_number
+   */
+  set_player_dead(player_number) {
+    this.#players[player_number].is_alive = false;
+  }
+
+  /**
    * @param {any} event
    * @param {any[]} args
    */
