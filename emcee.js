@@ -17,6 +17,11 @@ export class Emcee {
     this.#client.setOwner(this);
 
     this.#session = session;
+
+    // setup on next message
+    this.#client.on('on_next', () => {
+      this.#session.on_next();
+    });
   }
 
   // Public methods
