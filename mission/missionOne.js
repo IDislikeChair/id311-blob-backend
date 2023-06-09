@@ -14,8 +14,8 @@ export class MissionOne extends AbstractMission {
 
     this.#step_counts = [0, 0, 0, 0, 0, 0];
 
-    this.playerMgr.on_any_alive_player('stepOn', (player_number, steps) => {
-      this.#step_counts[player_number] = steps;
+    this.playerMgr.on_any_alive_player('stepOn', (msg) => {
+      this.#step_counts[msg.player_number] = msg.steps;
 
       this.emcee.emit('broadcastStepCounts', this.#step_counts);
     });
