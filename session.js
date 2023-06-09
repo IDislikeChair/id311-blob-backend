@@ -58,9 +58,8 @@ export class Session {
   add_client_as_emcee(client) {
     this.#emcee = new Emcee(client, this);
 
-    // TODO: Move this responsibility to Emcee class
-    this.#emcee.client.on('get_session_id', () => {
-      this.#emcee.client.emit('post_session_id', this.#id);
+    this.#emcee.on('get_session_id', () => {
+      this.#emcee.emit('post_session_id', this.#id);
     });
 
     client.emit('success_join_as_emcee');
@@ -81,8 +80,7 @@ export class Session {
   }
 
   end_session() {
-    // TODO: Move this responsibility to Emcee class
-    this.#emcee.client.disconnect();
+    this.#emcee.disconnect();
     this.#player_mgr.end_session();
   }
 
@@ -94,8 +92,7 @@ export class Session {
    * @param {number} mission_id
    */
   start_pre_mission(mission_id) {
-    // TODO: Move this responsibility to Emcee class
-    this.#emcee.client.emit('start_pre_mission', {
+    this.#emcee.emit('start_pre_mission', {
       mission_id,
     });
 
@@ -107,8 +104,7 @@ export class Session {
    * @param {number} duration
    */
   start_mission(mission_id, duration) {
-    // TODO: Move this responsibility to Emcee class
-    this.#emcee.client.emit('start_mission', {
+    this.#emcee.emit('start_mission', {
       mission_id,
       end_timestamp: Date.now() + duration,
     });
@@ -120,8 +116,7 @@ export class Session {
    * @param {number} mission_id
    */
   start_post_mission(mission_id) {
-    // TODO: Move this responsibility to Emcee class
-    this.#emcee.client.emit('start_post_mission', {
+    this.#emcee.emit('start_post_mission', {
       mission_id,
     });
 
@@ -129,8 +124,7 @@ export class Session {
   }
 
   start_end_screen() {
-    // TODO: Move this responsibility to Emcee class
-    this.#emcee.client.emit('start_end_screen');
+    this.#emcee.emit('start_end_screen');
 
     this.#player_mgr.start_end_screen();
   }
