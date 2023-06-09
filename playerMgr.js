@@ -83,9 +83,11 @@ export class PlayerMgr {
 
   /**
    * @param {Player} player
+   * @returns {number}
    */
-  add_player(player) {
+  add_player_and_get_player_number(player) {
     this.#players.push(player);
+    return this.#players.length - 1;
   }
 
   /**

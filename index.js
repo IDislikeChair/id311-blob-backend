@@ -30,7 +30,6 @@ SOCKET_MGR.get_io().on('connection', (socket) => {
         if (session) {
           session.add_client_as_player(player, o['player_name']);
           socket.removeAllListeners('join_as');
-          socket.emit('success_join_as_player');
         } else {
           socket.emit('error', 'error_session_not_found');
         }
