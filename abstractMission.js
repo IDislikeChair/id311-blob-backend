@@ -1,7 +1,15 @@
-import { Player } from './player.js';
+import { Emcee } from './emcee.js';
+import { PlayerMgr } from './playerMgr.js';
 
 export class AbstractMission {
-  constructor() {}
+  /**
+   * @param {Emcee} emcee
+   * @param {PlayerMgr} playerMgr
+   */
+  constructor(emcee, playerMgr) {
+    this.emcee = emcee;
+    this.playerMgr = playerMgr;
+  }
 
   /**
    * @returns {number}
@@ -10,10 +18,5 @@ export class AbstractMission {
     throw new Error('Not implemented');
   }
 
-  /**
-   * @returns {function(Map<Player, Object>): Map<Player, boolean>}
-   */
-  get_result_resolver() {
-    throw new Error('Not implemented');
-  }
+  run() {}
 }

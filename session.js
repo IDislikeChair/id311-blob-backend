@@ -20,8 +20,22 @@ export class Session {
   /** @type {Emcee} */
   #emcee;
 
+  /**
+   * @returns {Emcee}
+   */
+  get_emcee() {
+    return this.#emcee;
+  }
+
   /** @type {PlayerMgr} */
   #player_mgr;
+
+  /**
+   * @returns {PlayerMgr}
+   */
+  get_player_mgr() {
+    return this.#player_mgr;
+  }
 
   /** @type {GameFlowMgr} */
   #game_flow_mgr;
@@ -104,11 +118,9 @@ export class Session {
 
   /**
    * @param {number} mission_id
-   * @param {function(Map<Player, Object>): Map<Player, boolean>} result_resolver
    */
-  start_post_mission_and_resolve_results(mission_id, result_resolver) {
+  start_post_mission(mission_id) {
     // TODO: Move this responsibility to Emcee class
-    this.#player_mgr.resolve_results(mission_id, result_resolver);
     this.#emcee.client.emit('start_post_mission', {
       mission_id,
     });

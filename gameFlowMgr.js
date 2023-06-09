@@ -89,11 +89,20 @@ export class GameFlowMgr {
   #get_mission(mission_id) {
     switch (mission_id) {
       case 1:
-        return new MissionOne();
+        return new MissionOne(
+          this.#session.get_emcee(),
+          this.#session.get_player_mgr()
+        );
       case 2:
-        return new MissionTwo();
+        return new MissionTwo(
+          this.#session.get_emcee(),
+          this.#session.get_player_mgr()
+        );
       case 3:
-        return new MissionThree();
+        return new MissionThree(
+          this.#session.get_emcee(),
+          this.#session.get_player_mgr()
+        );
       default:
         throw new Error('Invalid mission id: ' + mission_id);
     }
@@ -121,9 +130,7 @@ export class GameFlowMgr {
    * @param {number} mission_id
    */
   #start_post_mission(mission_id) {
-    this.#session.start_post_mission_and_resolve_results(
-      mission_id,
-      this.#mission.get_result_resolver()
-    );
+    this.#get_mission(mission_id).run();
+    this.#session.start_post_mission(mission_id);
   }
 }

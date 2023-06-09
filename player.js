@@ -111,6 +111,22 @@ export class Player {
     this.#client.disconnect();
   }
 
+  /**
+   * @param {any} event
+   * @param {any[]} args
+   */
+  emit(event, ...args) {
+    this.#client.emit(event, ...args);
+  }
+
+  /**
+   * @param {any} event
+   * @param {any} callback
+   */
+  on(event, callback) {
+    this.#client.on(event, callback);
+  }
+
   // Interface methods
 
   on_client_disconnect() {

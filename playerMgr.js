@@ -94,4 +94,89 @@ export class PlayerMgr {
   remove_player(player) {
     this.#players = this.#players.filter((p) => p !== player);
   }
+
+  /**
+   * @param {string | number} player_number
+   */
+  set_player_dead(player_number) {
+    this.#players[player_number].is_alive = false;
+  }
+
+  /**
+   * @param {any} event
+   * @param {any[]} args
+   */
+  emit_to_all_players(event, ...args) {
+    for (const player of this.#players) {
+      player.emit(event, ...args);
+    }
+  }
+
+  /**
+   * @param {any} event
+   * @param {any} callback
+   */
+  on_any_player(event, callback) {
+    for (const player of this.#players) {
+      player.on(event, callback);
+    }
+  }
+
+  /**
+   * @param {any} event
+   * @param {any[]} args
+   */
+  emit_to_alive_players(event, ...args) {
+    for (const player of this.#players) {
+      if (player.is_alive) {
+        player.emit(event, ...args);
+      }
+    }
+  }
+
+  /**
+   * @param {any} event
+   * @param {any} callback
+   */
+  on_any_alive_player(event, callback) {
+    for (const player of this.#players) {
+      if (player.is_alive) {
+        player.on(event, callback);
+      }
+    }
+  }
+
+  /**
+   * @param {number} player_number
+   * @param {any} event
+   * @param {any[]} args
+   */
+  emit_to_player(player_number, event, ...args) {
+    if (player_number > 5)
+      console.warn(
+        `playerMgr.emit_to_player: player_number ${player_number} is more than 5`
+      );
+
+    const player = this.#players[player_number];
+    if (player) {
+      player.emit(event, ...args);
+    }
+  }
+
+  /**
+   * @param {number} player_number
+   * @param {any} event
+   * @param {any} callback
+   */
+  on_player(player_number, event, callback) {
+    if (player_number > 5)
+      console.warn(
+        `playerMgr.on_player: player_number ${player_number} is more than 5`
+      );
+
+    const player = this.#players[player_number];
+    if (player) {
+      player.on(event, callback);
+    }
+  }
 }
