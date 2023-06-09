@@ -73,9 +73,10 @@ export class Session {
     if (!this.#player_mgr.is_name_unused(name)) {
       client.emit('error', 'error_name_taken');
     } else {
-      client.emit('success_join_as_player');
       const player = new Player(client, name, this.#player_mgr);
-      this.#player_mgr.add_player(player);
+      const player_number =
+        this.#player_mgr.add_player_and_get_player_number(player);
+      client.emit('success_join_as_player', { player_number });
     }
   }
 
