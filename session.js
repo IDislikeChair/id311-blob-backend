@@ -84,7 +84,7 @@ export class Session {
       const player = new Player(client, name, this.#player_mgr);
       const player_number =
         this.#player_mgr.add_player_and_get_player_number(player);
-      client.emit('success_join_as_player', { player_number });
+      player.emit('success_join_as_player', { player_number });
     }
   }
 
