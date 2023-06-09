@@ -80,6 +80,7 @@ export class Session {
     if (!this.#player_mgr.is_name_unused(name)) {
       client.emit('error', 'error_name_taken');
     } else {
+      console.log('session.add_client_as_player: adding player...');
       const player = new Player(client, name, this.#player_mgr);
       const player_number =
         this.#player_mgr.add_player_and_get_player_number(player);
