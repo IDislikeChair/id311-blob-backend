@@ -5,8 +5,8 @@ import { MissionTwo } from './mission/missionTwo.js';
 import { Session } from './session.js';
 
 export class GameFlowMgr {
-  static AFTER_MISSION_DELAY = 200000000;
-  //   static AFTER_MISSION_DELAY = 2000;
+  //   static AFTER_MISSION_DELAY = 200000000;
+  static AFTER_MISSION_DELAY = 2000;
 
   static GAME_STATE = {
     START: 0,
@@ -126,7 +126,7 @@ export class GameFlowMgr {
 
     setTimeout(() => {
       this.on_next();
-    }, duration + GameFlowMgr.AFTER_MISSION_DELAY);
+    }, duration + GameFlowMgr.AFTER_MISSION_DELAY + (mission_id == 2 ? 200000000 : 0));
   }
 
   /**
@@ -135,6 +135,22 @@ export class GameFlowMgr {
   #start_post_mission(mission_id) {
     this.#get_mission(mission_id).run();
     this.#session.start_post_mission(mission_id);
+  }
+
+  set_mission(mission_id) {
+    // for debug
+    switch (mission_id) {
+      case 1:
+        this.#state = GameFlowMgr.GAME_STATE.PRE_MISSION_1;
+        break;
+      case 2:
+        this.#state = GameFlowMgr.GAME_STATE.PRE_MISSION_2;
+        break;
+      case 3:
+        this.#state = GameFlowMgr.GAME_STATE.PRE_MISSION_3;
+        break;
+    }
+    if (!this.#mission) this.#start_pre_mission(mission_id);
   }
 
   // for debug

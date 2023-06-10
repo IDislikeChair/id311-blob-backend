@@ -105,6 +105,7 @@ export class Session {
       mission_id,
     });
 
+    this.#game_flow_mgr.set_mission(mission_id);
     this.#player_mgr.start_pre_mission(mission_id);
   }
 
