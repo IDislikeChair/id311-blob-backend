@@ -3,13 +3,19 @@ import { Client } from './client.js';
 import SOCKET_MGR from './socketMgr.js';
 
 const session_mgr = new SessionMgr();
-const players = {};
+let players = {};
 let joined_players = 0;
 
 SOCKET_MGR.get_io().on('connection', (socket) => {
   console.log('A new client has connected.' + socket.id);
 
   socket.on('message', (message) => console.log(message));
+
+  socket.on('reset_players', () => {
+    // temporary
+    players = {};
+  });
+
   socket.on('stepOn', (steps) => {
     console.log(
       `clientMgr.constructor: step from PLAYER ${
@@ -46,6 +52,9 @@ SOCKET_MGR.get_io().on('connection', (socket) => {
 
         socket.removeAllListeners('join_as');
         socket.emit('success_join_as_emcee', new_session.get_session_id());
+        socket.on('DEBUG_go_to_pre_mission', (id) => {
+          new_session.start_pre_mission(id);
+        });
         break;
       case 1:
         const player = new Client(socket.id);
@@ -63,6 +72,7 @@ SOCKET_MGR.get_io().on('connection', (socket) => {
             pName: o['player_name'],
             steps: 0,
             tilts: 0,
+            alive: true,
           };
         } else {
           socket.emit('error', 'error_session_not_found');
