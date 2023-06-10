@@ -20,6 +20,13 @@ export class MissionOne extends AbstractMission {
       this.emcee.emit('broadcastStepCounts', this.#step_counts);
     });
 
+    this.playerMgr.on_any_alive_player('getStepCount', (msg) => {
+      this.playerMgr.emit(
+        'returnStepCount',
+        this.#step_counts[msg.player_number]
+      );
+    });
+
     this.emcee.on('resetStepCounts', () => {
       this.#step_counts = [0, 0, 0, 0, 0, 0];
     });

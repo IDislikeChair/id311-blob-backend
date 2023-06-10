@@ -3,11 +3,27 @@ import { Client } from './client.js';
 import SOCKET_MGR from './socketMgr.js';
 
 const session_mgr = new SessionMgr();
+const players = {};
+let joined_players = 0;
 
 SOCKET_MGR.get_io().on('connection', (socket) => {
   console.log('A new client has connected.' + socket.id);
 
   socket.on('message', (message) => console.log(message));
+  socket.on('stepOn', (steps) => {
+    console.log(
+      `clientMgr.constructor: step from PLAYER ${
+        players[socket.id].pNum
+      }: ${steps}`
+    );
+
+    players[socket.id].steps = steps;
+    socket.emit('getMyStepCounts', players[socket.id].steps);
+  });
+
+  setInterval(() => {
+    socket.emit('broadcastStepCount', players);
+  }, 100);
 
   socket.on('join_as', (o) => {
     console.log('join as: ' + o);
@@ -30,6 +46,13 @@ SOCKET_MGR.get_io().on('connection', (socket) => {
         if (session) {
           session.add_client_as_player(player, o['player_name']);
           socket.removeAllListeners('join_as');
+
+          console.log('success_join_as_player');
+          players[socket.id] = {
+            pNum: joined_players++,
+            pName: o['player_name'],
+            steps: 0,
+          };
         } else {
           socket.emit('error', 'error_session_not_found');
         }

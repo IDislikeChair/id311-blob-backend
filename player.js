@@ -44,9 +44,9 @@ export class Player {
 
   start_pre_mission(mission_id) {
     // First check if player is idling.
-    if (this.get_status() !== PlayerStatus.IDLE) {
-      throw new Error('Player is not idling.');
-    }
+    // if (this.get_status() !== PlayerStatus.IDLE) {
+    //   throw new Error('Player is not idling, start_pre_mission.');
+    // }
 
     this.#client.emit('start_pre_mission', { mission_id: mission_id });
   }
@@ -57,9 +57,9 @@ export class Player {
    */
   start_mission(mission_id, end_timestamp) {
     // First check if player is idling.
-    if (this.get_status() !== PlayerStatus.IDLE) {
-      throw new Error('Player is not idling.');
-    }
+    // if (this.get_status() !== PlayerStatus.IDLE) {
+    //   throw new Error('Player is not idling, start_mission.');
+    // }
 
     this.#client.emit('start_mission', {
       mission_id: mission_id,

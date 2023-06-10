@@ -5,6 +5,7 @@ import { MissionTwo } from './mission/missionTwo.js';
 import { Session } from './session.js';
 
 export class GameFlowMgr {
+  //   static AFTER_MISSION_DELAY = 200000000;
   static AFTER_MISSION_DELAY = 2000;
 
   static GAME_STATE = {
@@ -123,7 +124,9 @@ export class GameFlowMgr {
     const duration = this.#mission.get_duration();
     this.#session.start_mission(mission_id, duration);
 
-    setTimeout(this.on_next, duration + GameFlowMgr.AFTER_MISSION_DELAY);
+    setTimeout(() => {
+      this.on_next();
+    }, duration + GameFlowMgr.AFTER_MISSION_DELAY);
   }
 
   /**
