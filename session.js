@@ -41,6 +41,13 @@ export class Session {
   #game_flow_mgr;
 
   /**
+   * @returns {GameFlowMgr}
+   */
+  get_game_flow_mgr() {
+    return this.#game_flow_mgr;
+  }
+
+  /**
    * @param {SessionMgr} session_mgr
    * @param {number} id
    */
@@ -73,10 +80,11 @@ export class Session {
     if (!this.#player_mgr.is_name_unused(name)) {
       client.emit('error', 'error_name_taken');
     } else {
+      console.log('session.add_client_as_player: adding player...');
       const player = new Player(client, name, this.#player_mgr);
       const player_number =
         this.#player_mgr.add_player_and_get_player_number(player);
-      client.emit('success_join_as_player', { player_number });
+      player.emit('success_join_as_player', { player_number });
     }
   }
 

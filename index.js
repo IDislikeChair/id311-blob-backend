@@ -37,6 +37,8 @@ SOCKET_MGR.get_io().on('connection', (socket) => {
 
   socket.on('join_as', (o) => {
     console.log('join as: ' + o);
+    socket.emit('message', 'joining you.');
+
     switch (o.role) {
       case 0:
         const emcee = new Client(socket.id);
