@@ -152,4 +152,22 @@ export class GameFlowMgr {
     }
     if (!this.#mission) this.#start_pre_mission(mission_id);
   }
+
+  // for debug
+  DEBUG_go_to_pre_mission(mission_id) {
+    switch (mission_id) {
+      case 1:
+        this.#state = GameFlowMgr.GAME_STATE.PRE_MISSION_1;
+        this.#start_pre_mission(mission_id);
+        break;
+      case 2:
+        this.#state = GameFlowMgr.GAME_STATE.PRE_MISSION_2;
+        this.#start_pre_mission(mission_id);
+        break;
+      case 3:
+        this.#state = GameFlowMgr.GAME_STATE.PRE_MISSION_3;
+        this.#start_pre_mission(mission_id);
+        break;
+    }
+  }
 }
