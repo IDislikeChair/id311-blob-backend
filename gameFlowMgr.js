@@ -5,8 +5,8 @@ import { MissionTwo } from './mission/missionTwo.js';
 import { Session } from './session.js';
 
 export class GameFlowMgr {
-  //   static AFTER_MISSION_DELAY = 200000000;
-  static AFTER_MISSION_DELAY = 2000;
+  static AFTER_MISSION_DELAY = 200000000;
+  //   static AFTER_MISSION_DELAY = 2000;
 
   static GAME_STATE = {
     START: 0,

@@ -20,9 +20,19 @@ SOCKET_MGR.get_io().on('connection', (socket) => {
     players[socket.id].steps = steps;
     socket.emit('getMyStepCounts', players[socket.id].steps);
   });
+  socket.on('beTilted', (amount) => {
+    console.log(
+      `clientMgr.constructor: tilt from PLAYER ${
+        players[socket.id].pNum
+      }: ${amount}`
+    );
+
+    players[socket.id].tilts = amount;
+    socket.emit('getMyTiltedAmount', players[socket.id].tilts);
+  });
 
   setInterval(() => {
-    socket.emit('broadcastStepCount', players);
+    socket.emit('broadcastPlayerStatus', players);
   }, 100);
 
   socket.on('join_as', (o) => {
@@ -52,6 +62,7 @@ SOCKET_MGR.get_io().on('connection', (socket) => {
             pNum: joined_players++,
             pName: o['player_name'],
             steps: 0,
+            tilts: 0,
           };
         } else {
           socket.emit('error', 'error_session_not_found');
