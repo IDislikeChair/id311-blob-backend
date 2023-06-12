@@ -23,7 +23,7 @@ export class Client {
    * @param {string} socketId
    */
   constructor(socketId) {
-    if ((socketId = 'FAKE_SOCKET')) return;
+    if (socketId === 'FAKE_SOCKET') return;
 
     this.socketId = socketId;
 
