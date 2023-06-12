@@ -16,7 +16,7 @@ export class MissionOne extends AbstractMission {
   constructor(gameFlowMgr) {
     super(gameFlowMgr);
 
-    this.#stepCounts = [0, 0, 0, 0, 0, 0];
+    this.#stepCounts = [2, 0, 0, 0, 0, 0];
     this.winnerNumbers = [];
 
     this.playerMgr.on_any_alive_player('stepOn', (playerNumber, steps) => {
@@ -41,16 +41,16 @@ export class MissionOne extends AbstractMission {
 
   wrap_up() {
     // Take the index of max of stepCounts until there are #MAX_WINNER_COUNT
-    while (this.winnerNumbers.length < this.#MAX_WINNER_COUNT) {
-      const notWiningPlayerNumbers = [0, 1, 2, 3, 4, 5].filter(
-        (n) => !this.winnerNumbers.includes(n)
-      );
+    const notWiningPlayerNumbers = [0, 1, 2, 3, 4, 5].filter(
+      (n) => !this.winnerNumbers.includes(n)
+    );
 
-      this.winnerNumbers.push(
-        notWiningPlayerNumbers.reduce((a, b) =>
-          this.#stepCounts[a] > this.#stepCounts[b] ? a : b
-        )
-      );
+    notWiningPlayerNumbers.sort(
+      (a, b) => this.#stepCounts[a] - this.#stepCounts[b]
+    );
+
+    while (this.winnerNumbers.length < this.#MAX_WINNER_COUNT) {
+      this.winnerNumbers.push(notWiningPlayerNumbers.pop() ?? -1);
     }
 
     // Set the rest of players dead.
