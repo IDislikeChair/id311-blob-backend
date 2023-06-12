@@ -47,6 +47,8 @@ export class MissionTwo extends AbstractMission {
       }
     }
 
+    console.log(this.#alivePlayerNumbers);
+
     if (this.#alivePlayerNumbers.length !== 4) {
       // throw new Error('missionTwo: ');
     }
