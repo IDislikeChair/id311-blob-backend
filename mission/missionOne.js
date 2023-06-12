@@ -10,6 +10,8 @@ export class MissionOne extends AbstractMission {
   /** @type {number[]} */
   winnerNumbers;
 
+  #is_done = false;
+
   /**
    * @param {GameFlowMgr} gameFlowMgr
    */
@@ -32,7 +34,11 @@ export class MissionOne extends AbstractMission {
       (/** @type {number[]} */ newWinnerNumbers) => {
         this.winnerNumbers = newWinnerNumbers;
 
-        if (this.winnerNumbers.length === this.#MAX_WINNER_COUNT) {
+        if (
+          this.winnerNumbers.length === this.#MAX_WINNER_COUNT &&
+          !this.#is_done
+        ) {
+          this.#is_done = true;
           this.gameFlowMgr.on_next();
         }
       }
