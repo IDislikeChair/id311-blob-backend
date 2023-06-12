@@ -1,5 +1,6 @@
 import { AbstractMission } from '../abstractMission.js';
 import { Emcee } from '../emcee.js';
+import { GameFlowMgr } from '../gameFlowMgr.js';
 import { PlayerMgr } from '../playerMgr.js';
 
 export class MissionOne extends AbstractMission {
@@ -13,6 +14,7 @@ export class MissionOne extends AbstractMission {
 
   /**
    * @param {Emcee} emcee
+   * @param {GameFlowMgr} gameFlowMgr
    * @param {PlayerMgr} playerMgr
    */
   constructor(emcee, gameFlowMgr, playerMgr) {
@@ -22,21 +24,19 @@ export class MissionOne extends AbstractMission {
     this.#winner_numbers = [];
 
     this.playerMgr.on_any_alive_player('stepOn', (player_number, steps) => {
-      this.#stepCounts[player_number] =
-        steps < this.STEP_GOAL ? steps : this.STEP_GOAL;
-
-      if (
-        this.#stepCounts[player_number] === this.STEP_GOAL &&
-        !this.#winner_numbers.includes(player_number)
-      ) {
-        this.#winner_numbers.push(player_number);
+      if (!this.#winner_numbers.includes(player_number)) {
+        this.#stepCounts[player_number] = steps;
       }
+
+      this.emcee.emit('broadcastStepCounts', this.#stepCounts);
+    });
+
+    this.emcee.on('playersReach', (reachedPlayers) => {
+      this.#winner_numbers = reachedPlayers;
 
       if (this.#winner_numbers.length === 4) {
         this.gameFlowMgr.on_next();
       }
-
-      this.emcee.emit('broadcastStepCounts', this.#stepCounts);
     });
   }
 
@@ -58,5 +58,11 @@ export class MissionOne extends AbstractMission {
         this.playerMgr.set_player_dead(player_number);
       }
     }
+
+    console.log(
+      `MissionOne player alive status: ${[0, 1, 2, 3, 4, 5].map(
+        (player_number) => this.playerMgr.is_player_alive(player_number)
+      )}`
+    );
   }
 }
