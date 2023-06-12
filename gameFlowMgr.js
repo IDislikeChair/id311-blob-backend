@@ -92,6 +92,7 @@ export class GameFlowMgr {
       case 1:
         return new MissionOne(
           this.#session.get_emcee(),
+          this,
           this.#session.get_player_mgr()
         );
       case 2:
@@ -125,7 +126,16 @@ export class GameFlowMgr {
     this.#session.start_mission(mission_id, duration);
 
     setTimeout(() => {
-      this.on_next();
+      // If the current mission has not ended, force ending
+      if (
+        (this.#state === GameFlowMgr.GAME_STATE.MISSION_1 &&
+          mission_id === 1) ||
+        (this.#state === GameFlowMgr.GAME_STATE.MISSION_2 &&
+          mission_id === 2) ||
+        (this.#state === GameFlowMgr.GAME_STATE.MISSION_3 && mission_id === 3)
+      ) {
+        this.on_next();
+      }
     }, duration + GameFlowMgr.AFTER_MISSION_DELAY + (mission_id == 2 ? 200000000 : 0));
   }
 
