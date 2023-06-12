@@ -81,6 +81,10 @@ export class Session {
       player.emit('success_join_as_player', {
         player_number: player.get_number(),
       });
+
+      setInterval(() => {
+        player.emit('broadcastPlayerStatus', this.#playerMgr.get_status());
+      });
     }
   }
 
