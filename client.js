@@ -10,7 +10,6 @@ import SOCKET_MGR from './socketMgr.js';
 /**
  * Class for controlling socket instance, and setting up common listeners.
  * Client must be set up with an owner, which implements IClientOwner.
- * @property {Socket} socket
  */
 export class Client {
   /** @type {IClientOwner} */
@@ -26,8 +25,6 @@ export class Client {
     this.#socketId = socketId;
 
     if (socketId === 'FAKE_SOCKET') return;
-
-    this.socketId = socketId;
 
     const socket = SOCKET_MGR.get_socket_by_id(socketId);
     if (socket) {

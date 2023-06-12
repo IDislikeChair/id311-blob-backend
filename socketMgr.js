@@ -55,7 +55,7 @@ class SocketMgr {
   }
 
   /**
-   * @param {string | string[]} socketId
+   * @param {string} socketId
    * @param {any} event
    * @param {any[]} args
    */
