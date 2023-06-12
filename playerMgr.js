@@ -16,9 +16,9 @@ export class PlayerMgr {
    */
   start_pre_mission(missionId) {
     for (const player of this.#players) {
-      if (player.is_alive()) {
-        player.start_pre_mission(missionId);
-      }
+      //   if (player.is_alive()) {
+      player.start_pre_mission(missionId);
+      //   }
     }
   }
 
@@ -27,9 +27,9 @@ export class PlayerMgr {
    */
   start_mission(missionId) {
     for (const player of this.#players) {
-      if (player.is_alive()) {
-        player.start_mission(missionId);
-      }
+      //   if (player.is_alive()) {
+      player.start_mission(missionId);
+      //   }
     }
   }
 
@@ -38,9 +38,9 @@ export class PlayerMgr {
    */
   start_post_mission(missionId) {
     for (const player of this.#players) {
-      if (player.is_alive()) {
-        player.start_post_mission(missionId);
-      }
+      //   if (player.is_alive()) {
+      player.start_post_mission(missionId);
+      //   }
     }
   }
 
