@@ -16,7 +16,7 @@ export class MissionOne extends AbstractMission {
   constructor(gameFlowMgr) {
     super(gameFlowMgr);
 
-    this.#stepCounts = [2, 0, 0, 0, 0, 0];
+    this.#stepCounts = [0, 0, 0, 0, 0, 0];
     this.winnerNumbers = [];
 
     this.playerMgr.on_any_alive_player('stepOn', (playerNumber, steps) => {
