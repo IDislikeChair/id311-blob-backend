@@ -10,6 +10,7 @@ class MissionTwoPair {
     this.solverNumber = solverNumber;
     this.guiderNumber = guiderNumber;
     this.score = 0;
+    this.lockState = 50;
 
     this.answer = -1;
     this.generate_answer();
@@ -22,6 +23,8 @@ class MissionTwoPair {
 }
 
 export class MissionTwo extends AbstractMission {
+  #MOVE_RATE = 1;
+
   /** @type {number[]} */
   #alivePlayerNumbers;
 
@@ -58,7 +61,7 @@ export class MissionTwo extends AbstractMission {
     );
 
     // (2a) Send the score to TV.
-    this.#broadcastScoreToEmcee();
+    this.#broadcastStateToEmcee();
 
     // (3) Initialize each player's role.
     for (let pair of this.#pairs) {
@@ -70,9 +73,13 @@ export class MissionTwo extends AbstractMission {
       // If the answer is correct, send signal to guider.
       this.playerMgr.on_player(
         pair.solverNumber,
-        'tryAnswer',
-        (/** @type {number} */ answer) => {
-          if (pair.answer === answer) {
+        'sendAcceleration',
+        (xAcceleration) => {
+          pair.lockState += xAcceleration * this.#MOVE_RATE;
+          if (pair.lockState < 0) pair.lockState = 0;
+          if (pair.lockState > 99) pair.lockState = 99;
+
+          if (this.#checkAnswer(pair)) {
             this.playerMgr.emit_to_player(pair.guiderNumber, 'alertAnswer');
           }
         }
@@ -85,9 +92,12 @@ export class MissionTwo extends AbstractMission {
         pair.solverNumber,
         'submitAnswer',
         (/** @type {number} */ answer) => {
-          if (pair.answer === answer) {
+          if (this.#checkAnswer(pair)) {
             pair.score++;
-            this.#broadcastScoreToEmcee();
+            this.#broadcastStateToEmcee();
+
+            // END the game if the score has reached 3
+            if (pair.score === 3) this.gameFlowMgr.on_next();
           } else {
             this.#broadcastFailureToEmcee(this.#pairs.indexOf(pair));
           }
@@ -109,19 +119,28 @@ export class MissionTwo extends AbstractMission {
     }
   }
 
-  #broadcastScoreToEmcee() {
-    this.emcee.emit('broadcastScore', {
-      pairOne: {
+  /**
+   * @param {MissionTwoPair} pair
+   */
+  #checkAnswer(pair) {
+    return Math.floor(pair.lockState / 20) === pair.answer;
+  }
+
+  #broadcastStateToEmcee() {
+    this.emcee.emit('broadcastState', [
+      {
         solverNumber: this.#pairs[0].solverNumber,
         guiderNumber: this.#pairs[0].guiderNumber,
+        lockState: this.#pairs[0].lockState,
         score: this.#pairs[0].score,
       },
-      pairTwo: {
+      {
         solverNumber: this.#pairs[1].solverNumber,
         guiderNumber: this.#pairs[1].guiderNumber,
+        lockState: this.#pairs[1].lockState,
         score: this.#pairs[1].score,
       },
-    });
+    ]);
   }
 
   /**
