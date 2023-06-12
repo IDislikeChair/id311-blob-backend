@@ -92,6 +92,7 @@ export class MissionTwo extends AbstractMission {
           if (this.#checkAnswer(pair)) {
             this.playerMgr.emit_to_player(pair.guiderNumber, 'alertAnswer');
           }
+          this.#broadcastStateToEmcee();
         }
       );
 
