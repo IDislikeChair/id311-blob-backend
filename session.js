@@ -68,6 +68,10 @@ export class Session {
       this.#emcee.emit('post_session_id', this.#id);
     });
 
+    setInterval(() => {
+      this.#emcee.emit('broadcastPlayerStatus', this.#player_mgr.get_status());
+    });
+
     client.emit('success_join_as_emcee');
   }
 

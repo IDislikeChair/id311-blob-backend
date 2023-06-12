@@ -28,8 +28,6 @@ export class MissionOne extends AbstractMission {
       this.playerMgr.emit_to_player(player_number, 'getMyStepCounts', steps);
       this.emcee.emit('broadcastStepCounts', this.#player_statuses);
     });
-
-    setInterval('broadcastPlayerStatus', 100);
   }
 
   get_duration() {

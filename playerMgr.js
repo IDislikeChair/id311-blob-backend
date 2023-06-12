@@ -187,4 +187,13 @@ export class PlayerMgr {
       player.on(event, callback);
     }
   }
+
+  /** @returns {Object[]} */
+  get_status() {
+    return this.#players.map((player) => ({
+      pNum: player.get_player_number(),
+      pName: player.get_name(),
+      alive: player.is_alive(),
+    }));
+  }
 }
