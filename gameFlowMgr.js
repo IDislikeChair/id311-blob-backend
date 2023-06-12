@@ -139,14 +139,14 @@ export class GameFlowMgr {
       ) {
         this.on_next();
       }
-    }, 2 * 60 * 1000 + (missionId == 2 ? 200000000 : 0));
+    }, (2 * 60 * 1000) / 4 + (missionId == 2 ? 200000000 : 0));
   }
 
   /**
    * @param {number} missionId
    */
   #start_post_mission(missionId) {
-    this.#get_mission(missionId).wrap_up();
+    this.#mission.wrap_up();
     this.#session.start_post_mission(missionId);
   }
 
