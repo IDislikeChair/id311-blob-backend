@@ -48,7 +48,7 @@ export class MissionTwo extends AbstractMission {
       }
     }
 
-    console.log(this.#alivePlayerNumbers);
+    console.log('alivePlayerNumbers', this.#alivePlayerNumbers);
 
     if (this.#alivePlayerNumbers.length !== 4) {
       // throw new Error('missionTwo: ');
@@ -71,7 +71,12 @@ export class MissionTwo extends AbstractMission {
     );
 
     // (2a) Send the score to TV.
-    this.#broadcastStateToEmcee();
+    this.broadcastPairInterval = setInterval(() => {
+      this.#broadcastStateToEmcee();
+    }, 100);
+    this.emcee.on('gotPairs', () => {
+      clearInterval(this.broadcastPairInterval);
+    });
 
     // (3) Initialize each player's role.
     // TODO: Find a better solution that this crap.
