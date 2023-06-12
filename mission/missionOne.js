@@ -42,8 +42,14 @@ export class MissionOne extends AbstractMission {
   wrap_up() {
     // Take the index of max of stepCounts until there are #MAX_WINNER_COUNT
     while (this.winnerNumbers.length < this.#MAX_WINNER_COUNT) {
+      const notWiningPlayerNumbers = [0, 1, 2, 3, 4, 5].filter(
+        (n) => !this.winnerNumbers.includes(n)
+      );
+
       this.winnerNumbers.push(
-        this.#stepCounts.indexOf(Math.max(...this.#stepCounts))
+        notWiningPlayerNumbers.reduce((a, b) =>
+          this.#stepCounts[a] > this.#stepCounts[b] ? a : b
+        )
       );
     }
 
