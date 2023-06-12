@@ -79,6 +79,17 @@ export class MissionTwo extends AbstractMission {
       for (let pair of this.#pairs) {
         this.playerMgr.emit_to_player(pair.solverNumber, 'missionTwoRole', 0);
         this.playerMgr.emit_to_player(pair.guiderNumber, 'missionTwoRole', 1);
+
+        this.playerMgr.emit_to_player(
+          pair.solverNumber,
+          'myRolePartner',
+          pair.guiderNumber
+        );
+        this.playerMgr.emit_to_player(
+          pair.guiderNumber,
+          'myRolePartner',
+          pair.solverNumber
+        );
       }
     }, 100);
 
