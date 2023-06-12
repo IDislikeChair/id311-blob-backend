@@ -18,9 +18,8 @@ export class SessionMgr {
    */
   create_new_session() {
     const id = this.#get_new_random_id();
-    const session = new Session(this, id);
+    const session = new Session(id);
     this.#sessions.set(id, session);
-    console.log(this.#sessions);
     return session;
   }
 
@@ -29,7 +28,6 @@ export class SessionMgr {
    * @returns {Session | undefined}
    */
   get_session_by_id(id) {
-    console.log(this.#sessions);
     return this.#sessions.get(id);
   }
 

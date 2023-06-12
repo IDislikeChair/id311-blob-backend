@@ -11,8 +11,6 @@ class SocketMgr {
   /** @type {Server} */
   static #io;
 
-  static sockets;
-
   /**
    * @returns {Server}
    */
@@ -40,7 +38,7 @@ class SocketMgr {
 
     const port = process.env.PORT || 3000;
     server.listen(port, () =>
-      console.log(`socketMgr.js: Listening on port ${port}`)
+      console.log(`socketMgr: Listening on port ${port}`)
     );
   }
 
@@ -49,20 +47,20 @@ class SocketMgr {
   }
 
   /**
-   * @param {string} socket_id
+   * @param {string} socketId
    * @returns {Socket | undefined}
    */
-  get_socket_by_id(socket_id) {
-    return SocketMgr.#io.sockets.sockets.get(socket_id);
+  get_socket_by_id(socketId) {
+    return SocketMgr.#io.sockets.sockets.get(socketId);
   }
 
   /**
-   * @param {string | string[]} socket_id
+   * @param {string | string[]} socketId
    * @param {any} event
    * @param {any[]} args
    */
-  emit_to_socket_id(socket_id, event, ...args) {
-    SocketMgr.#io.to(socket_id).emit(event, ...args);
+  emit_to_socket_id(socketId, event, ...args) {
+    SocketMgr.#io.to(socketId).emit(event, ...args);
   }
 }
 

@@ -1,10 +1,9 @@
-import { Client } from './client.js';
-import { PlayerStatus } from './enum.js';
+import { Client, FakeClient } from './client.js';
 import { PlayerMgr } from './playerMgr.js';
 
 export class Player {
   /** @type {PlayerMgr} */
-  #player_mgr;
+  #playerMgr;
 
   /** @type {Client} */
   #client;
@@ -18,19 +17,19 @@ export class Player {
   }
 
   /** @type {number} */
-  #player_number;
+  #playerNumber;
 
   /** @returns {number} */
-  get_player_number() {
-    return this.#player_number;
+  get_number() {
+    return this.#playerNumber;
   }
 
   /** @type {boolean} */
-  #is_alive;
+  #isAlive;
 
   /** @returns {boolean} */
   is_alive() {
-    return this.#is_alive;
+    return this.#isAlive;
   }
 
   /** @returns {boolean} */
@@ -39,88 +38,55 @@ export class Player {
   }
 
   set_alive() {
-    this.#is_alive = true;
+    this.#isAlive = true;
   }
 
   set_dead() {
-    this.#is_alive = false;
+    this.#isAlive = false;
   }
 
   /**
-   * @param {Client} phone_client
+   * @param {Client} phoneClient
    * @param {string} name
-   * @param {number} player_number [0-5]
-   * @param {PlayerMgr} player_mgr
+   * @param {number} playerNumber [0-5]
+   * @param {PlayerMgr} playerMgr
    */
-  constructor(phone_client, name, player_number, player_mgr) {
-    this.#client = phone_client;
+  constructor(phoneClient, name, playerNumber, playerMgr) {
+    this.#client = phoneClient;
     this.#client.setOwner(this);
 
     this.#name = name;
-    this.#player_number = player_number;
-    this.#player_mgr = player_mgr;
+    this.#playerNumber = playerNumber;
+    this.#playerMgr = playerMgr;
 
-    this.#is_alive = true;
+    this.#isAlive = true;
   }
 
   // Public methods
-
   /**
-   * @returns {PlayerStatus}
+   * @param {number} missionId
    */
-  get_status() {
-    return this.#client.emit('get_status');
-  }
-
-  start_pre_mission(mission_id) {
-    this.#client.emit('start_pre_mission', { mission_id: mission_id });
+  start_pre_mission(missionId) {
+    this.#client.emit('start_pre_mission', { missionId: missionId });
   }
 
   /**
-   * @param {number} mission_id
-   * @param {number} end_timestamp
+   * @param {number} missionId
    */
-  start_mission(mission_id, end_timestamp) {
+  start_mission(missionId) {
     this.#client.emit('start_mission', {
-      mission_id: mission_id,
-      end_timestamp: end_timestamp,
+      missionId: missionId,
     });
   }
 
   /**
-   * @param {any} mission_id
+   * @param {any} missionId
    */
-  start_post_mission(mission_id) {
+  start_post_mission(missionId) {
     // Force mission to end.
     this.#client.emit('start_post_mission', {
-      mission_id: mission_id,
+      missionId: missionId,
     });
-  }
-
-  /**
-   * @param {number} mission_id
-   */
-  async get_mission_result(mission_id) {
-    // help (;-;)
-    const value = await new Promise((resolve, _) => {
-      // (1) request the result by emitting get_mission_result.
-      this.#client.emit('get_mission_result', mission_id);
-      let is_response_received = false;
-
-      // (2) try listening for a response, resolve with the data.
-      this.#client.on('post_mission_result', (data) => {
-        is_response_received = true;
-        resolve(data);
-      });
-
-      // (3) no response received after 5 seconds, resolve with null;
-      setTimeout(() => {
-        if (!is_response_received) resolve(null);
-      }, 5000);
-    });
-
-    // (4) return resolved value.
-    return value;
   }
 
   start_end_screen() {
@@ -150,6 +116,53 @@ export class Player {
   // Interface methods
 
   on_client_disconnect() {
-    this.#player_mgr.remove_player(this);
+    this.#playerMgr.remove_player(this);
+  }
+}
+
+export class FakePlayer extends Player {
+  /**
+   * @param {number} playerNumber
+   * @param {PlayerMgr} playerMgr
+   */
+  constructor(playerNumber, playerMgr) {
+    super(
+      new FakeClient(),
+      FakePlayer.#get_random_name() + '🤖',
+      playerNumber,
+      playerMgr
+    );
+  }
+
+  static #get_random_name() {
+    const names = [
+      'Alan',
+      'Bill',
+      'Carl',
+      'Dave',
+      'Emmy',
+      'Fran',
+      'Guts',
+      'Hank',
+      'Ivan',
+      'Jake',
+      'Karl',
+      'Liam',
+      'Mark',
+      'Nick',
+      'Owen',
+      'Paul',
+      'Quin',
+      'Rudy',
+      'Sean',
+      'Troy',
+      'Utah',
+      'Vern',
+      'Wade',
+      'Xing',
+      'Yuri',
+      'Zeus',
+    ];
+    return names[Math.floor(Math.random() * names.length)];
   }
 }

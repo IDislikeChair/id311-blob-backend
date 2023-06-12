@@ -7,8 +7,6 @@ let players = {};
 let joined_players = 0;
 
 SOCKET_MGR.get_io().on('connection', (socket) => {
-  console.log('A new client has connected.' + socket.id);
-
   socket.on('message', (message) => console.log(message));
 
   socket.on('beTilted', (amount) => {

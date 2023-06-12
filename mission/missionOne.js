@@ -1,68 +1,61 @@
 import { AbstractMission } from '../abstractMission.js';
-import { Emcee } from '../emcee.js';
 import { GameFlowMgr } from '../gameFlowMgr.js';
-import { PlayerMgr } from '../playerMgr.js';
 
 export class MissionOne extends AbstractMission {
-  STEP_GOAL = 100;
+  #MAX_WINNER_COUNT = 4;
 
   /** @type {number[]} */
   #stepCounts;
 
   /** @type {number[]} */
-  #winner_numbers;
+  winnerNumbers;
 
   /**
-   * @param {Emcee} emcee
    * @param {GameFlowMgr} gameFlowMgr
-   * @param {PlayerMgr} playerMgr
    */
-  constructor(emcee, gameFlowMgr, playerMgr) {
-    super(emcee, gameFlowMgr, playerMgr);
+  constructor(gameFlowMgr) {
+    super(gameFlowMgr);
 
     this.#stepCounts = [0, 0, 0, 0, 0, 0];
-    this.#winner_numbers = [];
+    this.winnerNumbers = [];
 
-    this.playerMgr.on_any_alive_player('stepOn', (player_number, steps) => {
-      if (!this.#winner_numbers.includes(player_number)) {
-        this.#stepCounts[player_number] = steps;
+    this.playerMgr.on_any_alive_player('stepOn', (playerNumber, steps) => {
+      if (!this.winnerNumbers.includes(playerNumber)) {
+        this.#stepCounts[playerNumber] = steps;
       }
 
       this.emcee.emit('broadcastStepCounts', this.#stepCounts);
     });
 
-    this.emcee.on('playersReach', (reachedPlayers) => {
-      this.#winner_numbers = reachedPlayers;
+    this.emcee.on(
+      'playersReach',
+      (/** @type {number[]} */ newWinnerNumbers) => {
+        this.winnerNumbers = newWinnerNumbers;
 
-      if (this.#winner_numbers.length === 4) {
-        this.gameFlowMgr.on_next();
+        if (this.winnerNumbers.length === this.#MAX_WINNER_COUNT) {
+          this.gameFlowMgr.on_next();
+        }
       }
-    });
+    );
   }
 
-  get_duration() {
-    return 60 * 1000;
-  }
-
-  run() {
-    // Take the index of max of stepCounts until there are 4 winners.
-    while (this.#winner_numbers.length < 4) {
-      this.#winner_numbers.push(
+  wrap_up() {
+    // Take the index of max of stepCounts until there are #MAX_WINNER_COUNT
+    while (this.winnerNumbers.length < this.#MAX_WINNER_COUNT) {
+      this.winnerNumbers.push(
         this.#stepCounts.indexOf(Math.max(...this.#stepCounts))
       );
     }
 
     // Set the rest of players dead.
-    for (let player_number = 0; player_number < 6; player_number++) {
-      if (!(player_number in this.#winner_numbers)) {
-        this.playerMgr.set_player_dead(player_number);
+    for (let playerNumber = 0; playerNumber < 6; playerNumber++) {
+      if (!(playerNumber in this.winnerNumbers)) {
+        this.playerMgr.set_player_dead(playerNumber);
       }
     }
 
     console.log(
-      `MissionOne player alive status: ${[0, 1, 2, 3, 4, 5].map(
-        (player_number) => this.playerMgr.is_player_alive(player_number)
-      )}`
+      `MissionOne.wrap_up: Winners from this round are ${this.winnerNumbers}`
     );
   }
 }

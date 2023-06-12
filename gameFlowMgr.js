@@ -5,9 +5,6 @@ import { MissionTwo } from './mission/missionTwo.js';
 import { Session } from './session.js';
 
 export class GameFlowMgr {
-  //   static AFTER_MISSION_DELAY = 200000000;
-  static AFTER_MISSION_DELAY = 2000;
-
   static GAME_STATE = {
     START: 0,
     PRE_MISSION_1: 1,
@@ -25,6 +22,11 @@ export class GameFlowMgr {
   /** @type {Session} */
   #session;
 
+  /** @returns {Session} */
+  get_session() {
+    return this.#session;
+  }
+
   /** @type {number} */
   #state;
 
@@ -40,9 +42,13 @@ export class GameFlowMgr {
   }
 
   on_next() {
-    if (this.#state == GameFlowMgr.GAME_STATE.END) {
+    if (this.#state === GameFlowMgr.GAME_STATE.END) {
       this.#session.end_session();
     } else {
+      if (this.#state === GameFlowMgr.GAME_STATE.START) {
+        this.#session.prepare();
+      }
+
       this.#state++;
     }
 
@@ -84,72 +90,62 @@ export class GameFlowMgr {
 
   // Private methods
   /**
-   * @param {number} mission_id
+   * @param {number} missionId
    * @returns {AbstractMission}
    */
-  #get_mission(mission_id) {
-    switch (mission_id) {
+  #get_mission(missionId) {
+    switch (missionId) {
       case 1:
-        return new MissionOne(
-          this.#session.get_emcee(),
-          this,
-          this.#session.get_player_mgr()
-        );
+        return new MissionOne(this);
       case 2:
-        return new MissionTwo(
-          this.#session.get_emcee(),
-          this.#session.get_player_mgr()
-        );
+        return new MissionTwo(this);
       case 3:
-        return new MissionThree(
-          this.#session.get_emcee(),
-          this.#session.get_player_mgr()
-        );
+        return new MissionThree(this);
       default:
-        throw new Error('Invalid mission id: ' + mission_id);
+        throw new Error('Invalid mission id: ' + missionId);
     }
   }
 
   /**
-   * @param {number} mission_id
+   * @param {number} missionId
    */
-  #start_pre_mission(mission_id) {
-    this.#mission = this.#get_mission(mission_id);
-    this.#session.start_pre_mission(mission_id);
+  #start_pre_mission(missionId) {
+    this.#mission = this.#get_mission(missionId);
+    this.#session.start_pre_mission(missionId);
   }
 
   /**
-   * @param {number} mission_id
+   * @param {number} missionId
    */
-  #start_mission(mission_id) {
-    const duration = this.#mission.get_duration();
-    this.#session.start_mission(mission_id, duration);
+  #start_mission(missionId) {
+    this.#session.start_mission(missionId);
 
     setTimeout(() => {
-      // If the current mission has not ended, force ending
+      // If the current mission has not ended, force it to end after 5 minutes.
       if (
-        (this.#state === GameFlowMgr.GAME_STATE.MISSION_1 &&
-          mission_id === 1) ||
-        (this.#state === GameFlowMgr.GAME_STATE.MISSION_2 &&
-          mission_id === 2) ||
-        (this.#state === GameFlowMgr.GAME_STATE.MISSION_3 && mission_id === 3)
+        (this.#state === GameFlowMgr.GAME_STATE.MISSION_1 && missionId === 1) ||
+        (this.#state === GameFlowMgr.GAME_STATE.MISSION_2 && missionId === 2) ||
+        (this.#state === GameFlowMgr.GAME_STATE.MISSION_3 && missionId === 3)
       ) {
         this.on_next();
       }
-    }, duration + GameFlowMgr.AFTER_MISSION_DELAY + (mission_id == 2 ? 200000000 : 0));
+    }, 5 * 60 * 1000 + (missionId == 2 ? 200000000 : 0));
   }
 
   /**
-   * @param {number} mission_id
+   * @param {number} missionId
    */
-  #start_post_mission(mission_id) {
-    this.#get_mission(mission_id).run();
-    this.#session.start_post_mission(mission_id);
+  #start_post_mission(missionId) {
+    this.#get_mission(missionId).wrap_up();
+    this.#session.start_post_mission(missionId);
   }
 
-  set_mission(mission_id) {
+  /**
+   * @param {number} missionId
+   */
+  set_mission(missionId) {
     // for debug
-    switch (mission_id) {
+    switch (missionId) {
       case 1:
         this.#state = GameFlowMgr.GAME_STATE.PRE_MISSION_1;
         break;
@@ -160,23 +156,26 @@ export class GameFlowMgr {
         this.#state = GameFlowMgr.GAME_STATE.PRE_MISSION_3;
         break;
     }
-    if (!this.#mission) this.#start_pre_mission(mission_id);
+    if (!this.#mission) this.#start_pre_mission(missionId);
   }
 
   // for debug
-  DEBUG_go_to_pre_mission(mission_id) {
-    switch (mission_id) {
+  /**
+   * @param {number} missionId
+   */
+  DEBUG_go_to_pre_mission(missionId) {
+    switch (missionId) {
       case 1:
         this.#state = GameFlowMgr.GAME_STATE.PRE_MISSION_1;
-        this.#start_pre_mission(mission_id);
+        this.#start_pre_mission(missionId);
         break;
       case 2:
         this.#state = GameFlowMgr.GAME_STATE.PRE_MISSION_2;
-        this.#start_pre_mission(mission_id);
+        this.#start_pre_mission(missionId);
         break;
       case 3:
         this.#state = GameFlowMgr.GAME_STATE.PRE_MISSION_3;
-        this.#start_pre_mission(mission_id);
+        this.#start_pre_mission(missionId);
         break;
     }
   }

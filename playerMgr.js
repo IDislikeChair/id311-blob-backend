@@ -1,4 +1,5 @@
-import { Player } from './player.js';
+import { Client } from './client.js';
+import { FakePlayer, Player } from './player.js';
 
 export class PlayerMgr {
   /** @type {Player[]} */
@@ -11,52 +12,34 @@ export class PlayerMgr {
   // Public methods
 
   /**
-   * @param {number} mission_id
+   * @param {number} missionId
    */
-  start_pre_mission(mission_id) {
+  start_pre_mission(missionId) {
     for (const player of this.#players) {
       if (player.is_alive()) {
-        player.start_pre_mission(mission_id);
+        player.start_pre_mission(missionId);
       }
     }
   }
 
   /**
-   * @param {number} mission_id
-   * @param {number} duration in milliseconds
+   * @param {number} missionId
    */
-  start_mission(mission_id, duration) {
+  start_mission(missionId) {
     for (const player of this.#players) {
       if (player.is_alive()) {
-        player.start_mission(mission_id, Date.now() + duration);
-      }
-    }
-  }
-
-  start_post_mission(mission_id) {
-    for (const player of this.#players) {
-      if (player.is_alive()) {
-        player.start_post_mission(mission_id);
+        player.start_mission(missionId);
       }
     }
   }
 
   /**
-   * @param {number} mission_id
-   * @param {function(Map<Player, Object>): Map<Player, boolean>} result_resolver
+   * @param {number} missionId
    */
-  resolve_results(mission_id, result_resolver) {
-    const player_to_result_map = new Map();
+  start_post_mission(missionId) {
     for (const player of this.#players) {
-      const result = player.get_mission_result(mission_id);
-      player_to_result_map.set(player, result);
-    }
-
-    const player_to_success_map = result_resolver(player_to_result_map);
-
-    for (const [player, success] of player_to_success_map) {
-      if (success) {
-        player.set_dead();
+      if (player.is_alive()) {
+        player.start_post_mission(missionId);
       }
     }
   }
@@ -82,13 +65,18 @@ export class PlayerMgr {
   }
 
   /**
-   * @param {import("./client.js").Client} client
+   * @param {Client} client
    * @param {string} name
    */
   create_new_player(client, name) {
-    const new_player_number = this.#players.length;
-    const new_player = new Player(client, name, new_player_number, this);
+    const new_playerNumber = this.#players.length;
+    const new_player = new Player(client, name, new_playerNumber, this);
     this.#players.push(new_player);
+
+    if (this.#players.length > 6) {
+      console.warn('playerMgr.create_new_player: more than 6 players created.');
+    }
+
     return new_player;
   }
 
@@ -99,12 +87,16 @@ export class PlayerMgr {
     this.#players = this.#players.filter((p) => p !== player);
   }
 
+  get_player_count() {
+    return this.#players.length;
+  }
+
   /**
-   * @param {number} player_number
+   * @param {number} playerNumber
    */
-  set_player_dead(player_number) {
-    if (this.#players[player_number]) {
-      this.#players[player_number].set_dead();
+  set_player_dead(playerNumber) {
+    if (this.#players[playerNumber]) {
+      this.#players[playerNumber].set_dead();
     }
   }
 
@@ -120,12 +112,12 @@ export class PlayerMgr {
 
   /**
    * @param {string} event
-   * @param {(player_number: number, message: any) => void} callback
+   * @param {(playerNumber: number, message: any) => void} callback
    */
   on_any_player(event, callback) {
     for (const player of this.#players) {
       player.on(event, (/** @type {any} */ individual_message) =>
-        callback(player.get_player_number(), individual_message)
+        callback(player.get_number(), individual_message)
       );
     }
   }
@@ -144,49 +136,49 @@ export class PlayerMgr {
 
   /**
    * @param {string} event
-   * @param {(player_number: number, message: any) => void} callback
+   * @param {(playerNumber: number, message: any) => void} callback
    */
   on_any_alive_player(event, callback) {
     for (const player of this.#players) {
       if (player.is_alive()) {
         player.on(event, (/** @type {any} */ individual_message) =>
-          callback(player.get_player_number(), individual_message)
+          callback(player.get_number(), individual_message)
         );
       }
     }
   }
 
   /**
-   * @param {number} player_number
+   * @param {number} playerNumber
    * @param {any} event
    * @param {any[]} args
    */
-  emit_to_player(player_number, event, ...args) {
-    if (player_number > 5)
+  emit_to_player(playerNumber, event, ...args) {
+    if (playerNumber > 5)
       console.warn(
-        `playerMgr.emit_to_player: player_number ${player_number} is more than 5`
+        `playerMgr.emit_to_player: playerNumber ${playerNumber} is more than 5`
       );
 
-    const player = this.#players[player_number];
+    const player = this.#players[playerNumber];
     if (player) {
       player.emit(event, ...args);
     }
   }
 
   /**
-   * @param {number} player_number
+   * @param {number} playerNumber
    * @param {any} event
    * @param {any} callback
    */
-  on_player(player_number, event, callback) {
-    if (player_number > this.#players.length - 1)
+  on_player(playerNumber, event, callback) {
+    if (playerNumber > this.#players.length - 1)
       console.warn(
-        `playerMgr.on_player: player_number ${player_number} is more than the number of players ${
+        `playerMgr.on_player: playerNumber ${playerNumber} is more than the number of players ${
           this.#players.length - 1
         }`
       );
 
-    const player = this.#players[player_number];
+    const player = this.#players[playerNumber];
     if (player) {
       player.on(event, callback);
     }
@@ -195,34 +187,41 @@ export class PlayerMgr {
   /** @returns {Object[]} */
   get_status() {
     return this.#players.map((player) => ({
-      pNum: player.get_player_number(),
+      pNum: player.get_number(),
       pName: player.get_name(),
       alive: player.is_alive(),
     }));
   }
 
   /**
-   * @param {number} player_number
+   * @param {number} playerNumber
    * @returns {string}
    */
-  get_player_name(player_number) {
-    if (this.#players[player_number]) {
-      return this.#players[player_number].get_name();
+  get_player_name(playerNumber) {
+    if (this.#players[playerNumber]) {
+      return this.#players[playerNumber].get_name();
     } else {
-      return 'EMPTY USER';
+      return 'Player';
     }
   }
 
   /**
    *
-   * @param {number} player_number
+   * @param {number} playerNumber
    * @returns {boolean}
    */
-  is_player_alive(player_number) {
-    if (this.#players[player_number]) {
-      return this.#players[player_number].is_alive();
+  is_player_alive(playerNumber) {
+    if (this.#players[playerNumber]) {
+      return this.#players[playerNumber].is_alive();
     } else {
       return false;
+    }
+  }
+
+  fill_with_fake_players_until_six_players() {
+    while (this.#players.length < 6) {
+      const fake_player = new FakePlayer(this.#players.length, this);
+      this.#players.push(fake_player);
     }
   }
 }
