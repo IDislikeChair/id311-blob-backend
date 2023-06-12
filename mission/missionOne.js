@@ -3,8 +3,7 @@ import { Emcee } from '../emcee.js';
 import { PlayerMgr } from '../playerMgr.js';
 
 export class MissionOne extends AbstractMission {
-  /** @type {Object.<number, Object.<string, number>>} */
-  #player_statuses;
+  #playerMissionStatuses;
 
   /**
    * @param {Emcee} emcee
@@ -13,20 +12,20 @@ export class MissionOne extends AbstractMission {
   constructor(emcee, playerMgr) {
     super(emcee, playerMgr);
 
-    // TODO: refactor this.
-    this.#player_statuses = {
-      0: { steps: 0 },
-      1: { steps: 0 },
-      2: { steps: 0 },
-      3: { steps: 0 },
-      4: { steps: 0 },
-      5: { steps: 0 },
-    };
+    this.#playerMissionStatuses = [];
+    for (let i = 0; i < 6; i++) {
+      this.#playerMissionStatuses[i] = {
+        pNum: i,
+        pName: playerMgr.get_player_name(i),
+        alive: playerMgr.is_player_alive(i),
+        steps: 0,
+      };
+    }
 
     this.playerMgr.on_any_alive_player('stepOn', (player_number, steps) => {
-      this.#player_statuses[player_number] = steps;
+      this.#playerMissionStatuses[player_number] = steps;
       this.playerMgr.emit_to_player(player_number, 'getMyStepCounts', steps);
-      this.emcee.emit('broadcastStepCounts', this.#player_statuses);
+      this.emcee.emit('broadcastStepCounts', this.#playerMissionStatuses);
     });
   }
 

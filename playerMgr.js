@@ -196,4 +196,21 @@ export class PlayerMgr {
       alive: player.is_alive(),
     }));
   }
+
+  /**
+   * @param {number} player_number
+   * @returns {string}
+   */
+  get_player_name(player_number) {
+    return this.#players[player_number].get_name();
+  }
+
+  /**
+   *
+   * @param {number} player_number
+   * @returns {boolean}
+   */
+  is_player_alive(player_number) {
+    return this.#players[player_number].is_alive();
+  }
 }
