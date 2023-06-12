@@ -25,7 +25,12 @@ export class MissionOne extends AbstractMission {
       this.#stepCounts[player_number] =
         steps < this.STEP_GOAL ? steps : this.STEP_GOAL;
 
-      this.#winner_numbers.push(player_number);
+      if (
+        this.#stepCounts[player_number] === this.STEP_GOAL &&
+        !this.#winner_numbers.includes(player_number)
+      ) {
+        this.#winner_numbers.push(player_number);
+      }
 
       if (this.#winner_numbers.length === 4) {
         this.gameFlowMgr.on_next();
