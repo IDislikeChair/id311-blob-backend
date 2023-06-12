@@ -2,7 +2,7 @@ import { SessionMgr } from './sessionMgr.js';
 import { Client } from './client.js';
 import SOCKET_MGR from './socketMgr.js';
 
-const session_mgr = new SessionMgr();
+const sessionMgr = new SessionMgr();
 let players = {};
 let joined_players = 0;
 
@@ -22,7 +22,7 @@ SOCKET_MGR.get_io().on('connection', (socket) => {
         const emcee = new Client(socket.id);
         console.log(socket.id);
 
-        const new_session = session_mgr.create_new_session();
+        const new_session = sessionMgr.create_new_session();
 
         new_session.register_client_as_emcee(emcee);
 
@@ -35,12 +35,12 @@ SOCKET_MGR.get_io().on('connection', (socket) => {
         const player = new Client(socket.id);
 
         // TODO: Make parsing the client's responsibility
-        const session = session_mgr.get_session_by_id(
-          parseInt(msg['session_id'])
+        const session = sessionMgr.get_session_by_id(
+          parseInt(msg['sessionId'])
         );
 
         if (session) {
-          session.try_register_client_as_player(player, msg['player_name']);
+          session.try_register_client_as_player(player, msg['playerName']);
           socket.removeAllListeners('join_as');
 
           players[socket.id] = {
