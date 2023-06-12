@@ -28,7 +28,7 @@ export class MissionTwo extends AbstractMission {
   /** @type {number[]} */
   #alivePlayerNumbers;
 
-  /** @type {[MissionTwoPair, MissionTwoPair]} */
+  /** @type {MissionTwoPair[]} */
   #pairs;
 
   /**
@@ -36,6 +36,8 @@ export class MissionTwo extends AbstractMission {
    */
   constructor(gameFlowMgr) {
     super(gameFlowMgr);
+
+    this.#pairs = [];
 
     // (1) Get the list of alive players from previous missions.
     this.#alivePlayerNumbers = [];
@@ -68,11 +70,15 @@ export class MissionTwo extends AbstractMission {
     this.#broadcastStateToEmcee();
 
     // (3) Initialize each player's role.
+    // TODO: Find a better solution that this crap.
+    this.broadcastRoleInterval = setInterval(() => {
+      for (let pair of this.#pairs) {
+        this.playerMgr.emit_to_player(pair.solverNumber, 'missionTwoRole', 0);
+        this.playerMgr.emit_to_player(pair.guiderNumber, 'missionTwoRole', 1);
+      }
+    }, 100);
+
     for (let pair of this.#pairs) {
-      this.playerMgr.emit_to_player(pair.solverNumber, 'missionTwoRole', 0);
-
-      this.playerMgr.emit_to_player(pair.guiderNumber, 'missionTwoRole', 1);
-
       // Set up listener for when solver try answer.
       // If the answer is correct, send signal to guider.
       this.playerMgr.on_player(
@@ -155,6 +161,8 @@ export class MissionTwo extends AbstractMission {
   }
 
   wrap_up() {
+    clearInterval(this.broadcastRoleInterval);
+
     const winnerNumbers =
       this.#pairs[0] > this.#pairs[1]
         ? [this.#pairs[0].solverNumber, this.#pairs[0].guiderNumber]
