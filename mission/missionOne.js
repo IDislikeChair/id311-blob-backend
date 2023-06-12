@@ -23,8 +23,7 @@ export class MissionOne extends AbstractMission {
     }
 
     this.playerMgr.on_any_alive_player('stepOn', (player_number, steps) => {
-      this.#playerMissionStatuses[player_number] = steps;
-      this.playerMgr.emit_to_player(player_number, 'getMyStepCounts', steps);
+      this.#playerMissionStatuses[player_number].steps = steps;
       this.emcee.emit('broadcastStepCounts', this.#playerMissionStatuses);
     });
   }
