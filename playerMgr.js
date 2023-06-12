@@ -202,7 +202,11 @@ export class PlayerMgr {
    * @returns {string}
    */
   get_player_name(player_number) {
-    return this.#players[player_number].get_name();
+    if (this.#players[player_number]) {
+      return this.#players[player_number].get_name();
+    } else {
+      return 'EMPTY USER';
+    }
   }
 
   /**
@@ -211,6 +215,10 @@ export class PlayerMgr {
    * @returns {boolean}
    */
   is_player_alive(player_number) {
-    return this.#players[player_number].is_alive();
+    if (this.#players[player_number]) {
+      return this.#players[player_number].is_alive();
+    } else {
+      return false;
+    }
   }
 }
