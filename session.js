@@ -59,6 +59,7 @@ export class Session {
     this.#emcee = new Emcee(client, this);
 
     this.#emcee.on('get_session_id', () => {
+      console.log('BEEP');
       this.#emcee.emit('post_session_id', this.#id);
     });
 
