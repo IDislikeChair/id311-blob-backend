@@ -3,7 +3,8 @@ import { Emcee } from '../emcee.js';
 import { PlayerMgr } from '../playerMgr.js';
 
 export class MissionOne extends AbstractMission {
-  #step_counts;
+  /** @type {Object.<number, Object.<string, number>>} */
+  #player_statuses;
 
   /**
    * @param {Emcee} emcee
@@ -12,24 +13,23 @@ export class MissionOne extends AbstractMission {
   constructor(emcee, playerMgr) {
     super(emcee, playerMgr);
 
-    this.#step_counts = [0, 0, 0, 0, 0, 0];
+    // TODO: refactor this.
+    this.#player_statuses = {
+      0: { steps: 0 },
+      1: { steps: 0 },
+      2: { steps: 0 },
+      3: { steps: 0 },
+      4: { steps: 0 },
+      5: { steps: 0 },
+    };
 
-    this.playerMgr.on_any_alive_player('stepOn', (msg) => {
-      this.#step_counts[msg.player_number] = msg.steps;
-
-      this.emcee.emit('broadcastStepCounts', this.#step_counts);
+    this.playerMgr.on_any_alive_player('stepOn', (player_number, steps) => {
+      this.#player_statuses[player_number] = steps;
+      this.playerMgr.emit_to_player(player_number, 'getMyStepCounts', steps);
+      this.emcee.emit('broadcastStepCounts', this.#player_statuses);
     });
 
-    this.playerMgr.on_any_alive_player('getStepCount', (msg) => {
-      this.playerMgr.emit(
-        'returnStepCount',
-        this.#step_counts[msg.player_number]
-      );
-    });
-
-    this.emcee.on('resetStepCounts', () => {
-      this.#step_counts = [0, 0, 0, 0, 0, 0];
-    });
+    setInterval('broadcastPlayerStatus', 100);
   }
 
   get_duration() {

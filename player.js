@@ -3,34 +3,64 @@ import { PlayerStatus } from './enum.js';
 import { PlayerMgr } from './playerMgr.js';
 
 export class Player {
+  /** @type {PlayerMgr} */
+  #player_mgr;
+
   /** @type {Client} */
   #client;
 
   /** @type {string} */
-  name;
+  #name;
 
-  /** @type {PlayerMgr} */
-  #player_mgr;
-
-  /** @type {boolean} */
-  is_alive;
+  /** @returns {string} */
+  get_name() {
+    return this.#name;
+  }
 
   /** @type {number} */
-  score;
+  #player_number;
+
+  /** @returns {number} */
+  get_player_number() {
+    return this.#player_number;
+  }
+
+  /** @type {boolean} */
+  #is_alive;
+
+  /** @returns {boolean} */
+  is_alive() {
+    return this.#is_alive;
+  }
+
+  /** @returns {boolean} */
+  is_dead() {
+    return !this.is_alive();
+  }
+
+  set_alive() {
+    this.#is_alive = true;
+  }
+
+  set_dead() {
+    this.#is_alive = false;
+  }
 
   /**
    * @param {Client} phone_client
    * @param {string} name
+   * @param {number} player_number [0-5]
    * @param {PlayerMgr} player_mgr
    */
-  constructor(phone_client, name, player_mgr) {
+  constructor(phone_client, name, player_number, player_mgr) {
     this.#client = phone_client;
     this.#client.setOwner(this);
-    this.name = name;
+
+    this.#name = name;
+    this.#player_number = player_number;
     this.#player_mgr = player_mgr;
 
-    this.is_alive = true;
-    this.score = 0;
+    this.#is_alive = true;
   }
 
   // Public methods

@@ -11,46 +11,20 @@ SOCKET_MGR.get_io().on('connection', (socket) => {
 
   socket.on('message', (message) => console.log(message));
 
-  socket.on('reset_players', () => {
-    // temporary
-    players = {};
-  });
-
-  socket.on('stepOn', (steps) => {
-    console.log(
-      `clientMgr.constructor: step from PLAYER ${
-        players[socket.id].pNum
-      }: ${steps}`
-    );
-
-    players[socket.id].steps = steps;
-    socket.emit('getMyStepCounts', players[socket.id].steps);
-  });
   socket.on('beTilted', (amount) => {
-    console.log(
-      `clientMgr.constructor: tilt from PLAYER ${
-        players[socket.id].pNum
-      }: ${amount}`
-    );
-
     players[socket.id].tilts = amount;
     socket.emit('getMyTiltedAmount', players[socket.id].tilts);
   });
 
-  setInterval(() => {
-    socket.emit('broadcastPlayerStatus', players);
-  }, 100);
-
-  socket.on('join_as', (o) => {
-    console.log('join as: ' + o);
+  socket.on('join_as', (msg) => {
     socket.emit('message', 'joining you.');
 
-    switch (o.role) {
+    switch (msg.role) {
       case 0:
         const emcee = new Client(socket.id);
 
         const new_session = session_mgr.create_new_session();
-        new_session.add_client_as_emcee(emcee);
+        new_session.try_register_client_as_emcee(emcee);
 
         socket.removeAllListeners('join_as');
         socket.emit('success_join_as_emcee', new_session.get_session_id());
@@ -61,17 +35,18 @@ SOCKET_MGR.get_io().on('connection', (socket) => {
       case 1:
         const player = new Client(socket.id);
 
+        // TODO: Make parsing the client's responsibility
         const session = session_mgr.get_session_by_id(
-          parseInt(o['session_id'])
+          parseInt(msg['session_id'])
         );
+
         if (session) {
-          session.add_client_as_player(player, o['player_name']);
+          session.try_register_client_as_player(player, msg['player_name']);
           socket.removeAllListeners('join_as');
 
-          console.log('success_join_as_player');
           players[socket.id] = {
             pNum: joined_players++,
-            pName: o['player_name'],
+            pName: msg['player_name'],
             steps: 0,
             tilts: 0,
             alive: true,

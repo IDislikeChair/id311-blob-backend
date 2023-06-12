@@ -1,7 +1,6 @@
 import { Client } from './client.js';
 import { Emcee } from './emcee.js';
 import { GameFlowMgr } from './gameFlowMgr.js';
-import { Player } from './player.js';
 import { PlayerMgr } from './playerMgr.js';
 import { SessionMgr } from './sessionMgr.js';
 
@@ -62,7 +61,7 @@ export class Session {
   /**
    * @param {Client} client
    */
-  add_client_as_emcee(client) {
+  try_register_client_as_emcee(client) {
     this.#emcee = new Emcee(client, this);
 
     this.#emcee.on('get_session_id', () => {
@@ -76,15 +75,15 @@ export class Session {
    * @param {Client} client
    * @param {string} name
    */
-  add_client_as_player(client, name) {
+  try_register_client_as_player(client, name) {
     if (!this.#player_mgr.is_name_unused(name)) {
       client.emit('error', 'error_name_taken');
     } else {
       console.log('session.add_client_as_player: adding player...');
-      const player = new Player(client, name, this.#player_mgr);
-      const player_number =
-        this.#player_mgr.add_player_and_get_player_number(player);
-      player.emit('success_join_as_player', { player_number });
+      const player = this.#player_mgr.create_new_player(client, name);
+      player.emit('success_join_as_player', {
+        player_number: player.get_player_number(),
+      });
     }
   }
 

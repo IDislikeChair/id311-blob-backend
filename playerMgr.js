@@ -15,7 +15,7 @@ export class PlayerMgr {
    */
   start_pre_mission(mission_id) {
     for (const player of this.#players) {
-      if (player.is_alive) {
+      if (player.is_alive()) {
         player.start_pre_mission(mission_id);
       }
     }
@@ -27,7 +27,7 @@ export class PlayerMgr {
    */
   start_mission(mission_id, duration) {
     for (const player of this.#players) {
-      if (player.is_alive) {
+      if (player.is_alive()) {
         player.start_mission(mission_id, Date.now() + duration);
       }
     }
@@ -35,7 +35,7 @@ export class PlayerMgr {
 
   start_post_mission(mission_id) {
     for (const player of this.#players) {
-      if (player.is_alive) {
+      if (player.is_alive()) {
         player.start_post_mission(mission_id);
       }
     }
@@ -56,7 +56,7 @@ export class PlayerMgr {
 
     for (const [player, success] of player_to_success_map) {
       if (success) {
-        player.is_alive = false;
+        player.set_dead();
       }
     }
   }
@@ -78,16 +78,18 @@ export class PlayerMgr {
    * @returns {boolean}
    */
   is_name_unused(name) {
-    return !this.#players.some((player) => player.name === name);
+    return !this.#players.some((player) => player.get_name() === name);
   }
 
   /**
-   * @param {Player} player
-   * @returns {number}
+   * @param {import("./client.js").Client} client
+   * @param {string} name
    */
-  add_player_and_get_player_number(player) {
-    this.#players.push(player);
-    return this.#players.length - 1;
+  create_new_player(client, name) {
+    const new_player_number = this.#players.length;
+    const new_player = new Player(client, name, new_player_number, this);
+    this.#players.push(new_player);
+    return new_player;
   }
 
   /**
@@ -105,7 +107,7 @@ export class PlayerMgr {
   }
 
   /**
-   * @param {any} event
+   * @param {string} event
    * @param {any[]} args
    */
   emit_to_all_players(event, ...args) {
@@ -115,35 +117,39 @@ export class PlayerMgr {
   }
 
   /**
-   * @param {any} event
-   * @param {any} callback
+   * @param {string} event
+   * @param {(player_number: number, message: any) => void} callback
    */
   on_any_player(event, callback) {
     for (const player of this.#players) {
-      player.on(event, callback);
+      player.on(event, (/** @type {any} */ individual_message) =>
+        callback(player.get_player_number(), individual_message)
+      );
     }
   }
 
   /**
-   * @param {any} event
+   * @param {string} event
    * @param {any[]} args
    */
   emit_to_alive_players(event, ...args) {
     for (const player of this.#players) {
-      if (player.is_alive) {
+      if (player.is_alive()) {
         player.emit(event, ...args);
       }
     }
   }
 
   /**
-   * @param {any} event
-   * @param {any} callback
+   * @param {string} event
+   * @param {(player_number: number, message: any) => void} callback
    */
   on_any_alive_player(event, callback) {
     for (const player of this.#players) {
-      if (player.is_alive) {
-        player.on(event, callback);
+      if (player.is_alive()) {
+        player.on(event, (/** @type {any} */ individual_message) =>
+          callback(player.get_player_number(), individual_message)
+        );
       }
     }
   }
