@@ -46,7 +46,7 @@ export class MissionTwo extends AbstractMission {
     }
 
     if (this.#alivePlayerNumbers.length !== 4) {
-      throw new Error('missionTwo: ');
+      // throw new Error('missionTwo: ');
     }
 
     // (2) Pair up players.
