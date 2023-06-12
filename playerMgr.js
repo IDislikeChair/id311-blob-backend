@@ -100,10 +100,12 @@ export class PlayerMgr {
   }
 
   /**
-   * @param {string | number} player_number
+   * @param {number} player_number
    */
   set_player_dead(player_number) {
-    this.#players[player_number].set_dead();
+    if (this.#players[player_number]) {
+      this.#players[player_number].set_dead();
+    }
   }
 
   /**
@@ -177,9 +179,11 @@ export class PlayerMgr {
    * @param {any} callback
    */
   on_player(player_number, event, callback) {
-    if (player_number > 5)
+    if (player_number > this.#players.length - 1)
       console.warn(
-        `playerMgr.on_player: player_number ${player_number} is more than 5`
+        `playerMgr.on_player: player_number ${player_number} is more than the number of players ${
+          this.#players.length - 1
+        }`
       );
 
     const player = this.#players[player_number];
