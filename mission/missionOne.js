@@ -32,7 +32,10 @@ export class MissionOne extends AbstractMission {
       (/** @type {number[]} */ newWinnerNumbers) => {
         this.winnerNumbers = newWinnerNumbers;
 
-        if (this.winnerNumbers.length === this.#MAX_WINNER_COUNT) {
+        if (
+          this.winnerNumbers.length === this.#MAX_WINNER_COUNT &&
+          this.gameFlowMgr.get_state() === GameFlowMgr.GAME_STATE.MISSION_1
+        ) {
           this.gameFlowMgr.on_next();
         }
       }
