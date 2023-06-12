@@ -55,7 +55,7 @@ export class Session {
   /**
    * @param {Client} client
    */
-  try_register_client_as_emcee(client) {
+  register_client_as_emcee(client) {
     this.#emcee = new Emcee(client, this);
 
     this.#emcee.on('get_session_id', () => {

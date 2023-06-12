@@ -42,6 +42,11 @@ export class GameFlowMgr {
   }
 
   on_next() {
+    console.log(
+      'GameFlowMgr.on_next: previous state = ' +
+        GameFlowMgr.GAME_STATE[this.#state]
+    );
+
     if (this.#state === GameFlowMgr.GAME_STATE.END) {
       this.#session.end_session();
     } else {
@@ -86,6 +91,11 @@ export class GameFlowMgr {
       default:
         throw new Error('Invalid game state: ' + 'this.#state');
     }
+
+    console.log(
+      'GameFlowMgr.on_next: current state = ' +
+        GameFlowMgr.GAME_STATE[this.#state]
+    );
   }
 
   // Private methods

@@ -20,9 +20,11 @@ SOCKET_MGR.get_io().on('connection', (socket) => {
     switch (msg.role) {
       case 0:
         const emcee = new Client(socket.id);
+        console.log(socket.id);
 
         const new_session = session_mgr.create_new_session();
-        new_session.try_register_client_as_emcee(emcee);
+
+        new_session.register_client_as_emcee(emcee);
 
         socket.removeAllListeners('join_as');
         socket.on('DEBUG_go_to_pre_mission', (id) => {
