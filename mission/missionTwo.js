@@ -10,6 +10,7 @@ class MissionTwoPair {
     this.solverNumber = solverNumber;
     this.guiderNumber = guiderNumber;
     this.score = 0;
+    this.lifeLeft = 5;
     this.lockState = 50;
 
     this.answer = -1;
@@ -114,6 +115,9 @@ export class MissionTwo extends AbstractMission {
             if (pair.score === 3) this.gameFlowMgr.on_next();
           } else {
             this.#broadcastFailureToEmcee(this.#pairs.indexOf(pair));
+            pair.lifeLeft -= 1;
+
+            if (pair.lifeLeft <= 0) this.gameFlowMgr.on_next();
           }
 
           this.playerMgr.emit_to_player(
@@ -146,12 +150,14 @@ export class MissionTwo extends AbstractMission {
         solverNumber: this.#pairs[0].solverNumber,
         guiderNumber: this.#pairs[0].guiderNumber,
         lockState: this.#pairs[0].lockState,
+        lifeLeft: this.#pairs[0].lifeLeft,
         score: this.#pairs[0].score,
       },
       {
         solverNumber: this.#pairs[1].solverNumber,
         guiderNumber: this.#pairs[1].guiderNumber,
         lockState: this.#pairs[1].lockState,
+        lifeLeft: this.#pairs[1].lifeLeft,
         score: this.#pairs[1].score,
       },
     ]);
@@ -167,14 +173,32 @@ export class MissionTwo extends AbstractMission {
   wrap_up() {
     clearInterval(this.broadcastRoleInterval);
 
-    const winnerNumbers =
-      this.#pairs[0] > this.#pairs[1]
-        ? [this.#pairs[0].solverNumber, this.#pairs[0].guiderNumber]
-        : [this.#pairs[1].solverNumber, this.#pairs[1].guiderNumber];
+    // const winnerNumbers =
+    //   this.#pairs[0] > this.#pairs[1]
+    //     ? [this.#pairs[0].solverNumber, this.#pairs[0].guiderNumber]
+    //     : [this.#pairs[1].solverNumber, this.#pairs[1].guiderNumber];
+
+    let winnerNumbers;
+
+    if (this.#pairs[0].lives <= 0)
+      winnerNumbers = [
+        this.#pairs[1].solverNumber,
+        this.#pairs[1].guiderNumber,
+      ];
+    else if (this.#pairs[1].lives <= 0)
+      winnerNumbers = [
+        this.#pairs[0].solverNumber,
+        this.#pairs[0].guiderNumber,
+      ];
+    else
+      winnerNumbers =
+        this.#pairs[0] > this.#pairs[1]
+          ? [this.#pairs[0].solverNumber, this.#pairs[0].guiderNumber]
+          : [this.#pairs[1].solverNumber, this.#pairs[1].guiderNumber];
 
     // Set the rest of players dead.
     for (let playerNumber = 0; playerNumber < 6; playerNumber++) {
-      if (!(playerNumber in winnerNumbers)) {
+      if (!winnerNumbers.include(playerNumber)) {
         this.playerMgr.set_player_dead(playerNumber);
       }
     }
