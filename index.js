@@ -25,7 +25,6 @@ SOCKET_MGR.get_io().on('connection', (socket) => {
         new_session.try_register_client_as_emcee(emcee);
 
         socket.removeAllListeners('join_as');
-        socket.emit('success_join_as_emcee', new_session.get_session_id());
         socket.on('DEBUG_go_to_pre_mission', (id) => {
           new_session.start_pre_mission(id);
         });
