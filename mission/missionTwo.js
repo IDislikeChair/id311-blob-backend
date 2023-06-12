@@ -47,6 +47,8 @@ export class MissionTwo extends AbstractMission {
       }
     }
 
+    console.log(this.#alivePlayerNumbers);
+
     if (this.#alivePlayerNumbers.length !== 4) {
       // throw new Error('missionTwo: ');
     }
@@ -93,6 +95,7 @@ export class MissionTwo extends AbstractMission {
           if (this.#checkAnswer(pair)) {
             this.playerMgr.emit_to_player(pair.guiderNumber, 'alertAnswer');
           }
+          this.#broadcastStateToEmcee();
         }
       );
 

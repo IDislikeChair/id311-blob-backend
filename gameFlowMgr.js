@@ -27,11 +27,6 @@ export class GameFlowMgr {
     return this.#session;
   }
 
-  /** @returns {number} */
-  get_state() {
-    return this.#state;
-  }
-
   /** @type {number} */
   #state;
 
@@ -91,7 +86,7 @@ export class GameFlowMgr {
         this.#session.start_end_screen();
         break;
       default:
-        throw new Error('Invalid game state: ' + 'this.#state');
+        throw new Error('Invalid game state: ' + this.#state);
     }
 
     console.log('GameFlowMgr.on_next: current state = ' + this.#state);

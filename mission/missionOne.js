@@ -10,6 +10,8 @@ export class MissionOne extends AbstractMission {
   /** @type {number[]} */
   winnerNumbers;
 
+  #is_done = false;
+
   /**
    * @param {GameFlowMgr} gameFlowMgr
    */
@@ -34,8 +36,9 @@ export class MissionOne extends AbstractMission {
 
         if (
           this.winnerNumbers.length === this.#MAX_WINNER_COUNT &&
-          this.gameFlowMgr.get_state() === GameFlowMgr.GAME_STATE.MISSION_1
+          !this.#is_done
         ) {
+          this.#is_done = true;
           this.gameFlowMgr.on_next();
         }
       }
@@ -58,7 +61,7 @@ export class MissionOne extends AbstractMission {
 
     // Set the rest of players dead.
     for (let playerNumber = 0; playerNumber < 6; playerNumber++) {
-      if (!(playerNumber in this.winnerNumbers)) {
+      if (!this.winnerNumbers.includes(playerNumber)) {
         this.playerMgr.set_player_dead(playerNumber);
       }
     }
