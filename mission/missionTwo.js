@@ -53,6 +53,7 @@ export class MissionTwo extends AbstractMission {
 
     // (2) Pair up players.
     // TODO: Randomize the pairing up process.
+    this.#pairs = [];
     this.#pairs.push(
       new MissionTwoPair(
         this.#alivePlayerNumbers[0],
