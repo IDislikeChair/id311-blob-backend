@@ -56,7 +56,7 @@ export class MissionOne extends AbstractMission {
     );
 
     while (this.winnerNumbers.length < this.#MAX_WINNER_COUNT) {
-      this.winnerNumbers.push(notWiningPlayerNumbers.pop());
+      this.winnerNumbers.push(notWiningPlayerNumbers.pop() ?? -1);
     }
 
     // Set the rest of players dead.
