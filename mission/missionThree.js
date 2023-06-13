@@ -96,6 +96,7 @@ export class MissionThree extends AbstractMission {
         console.log('submitShot', playerNum, this.#targetDummies[playerNum]);
         if (this.#targetDummies[playerNum].is_cursor_within_target_distance()) {
           this.#targetDummies[playerNum].victimHealthPoint -= 1;
+          this.#targetDummies[playerNum].generateNewTargetPosition();
           this.emcee.emit('shotSuccess', playerNum);
         } else {
           this.emcee.emit('shotFail', playerNum);
