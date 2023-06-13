@@ -130,7 +130,7 @@ export class MissionThree extends AbstractMission {
   }
 
   #broadcast_state_to_emcee() {
-    this.emcee.emit('broadcastState', this.#targetDummies);
+    this.emcee.emit('broadcastMission3State', this.#targetDummies);
   }
 
   wrap_up() {}

@@ -162,7 +162,7 @@ export class MissionTwo extends AbstractMission {
   }
 
   #broadcastStateToEmcee() {
-    this.emcee.emit('broadcastState', [
+    this.emcee.emit('broadcastMission2State', [
       {
         solverNumber: this.#pairs[0].solverNumber,
         guiderNumber: this.#pairs[0].guiderNumber,
