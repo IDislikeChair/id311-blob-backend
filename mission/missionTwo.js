@@ -211,7 +211,7 @@ export class MissionTwo extends AbstractMission {
       ];
     else
       winnerNumbers =
-        this.#pairs[0] > this.#pairs[1]
+        this.#pairs[0].score > this.#pairs[1].score
           ? [this.#pairs[0].solverNumber, this.#pairs[0].guiderNumber]
           : [this.#pairs[1].solverNumber, this.#pairs[1].guiderNumber];
 
