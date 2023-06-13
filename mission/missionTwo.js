@@ -125,6 +125,7 @@ export class MissionTwo extends AbstractMission {
         (/** @type {number} */ answer) => {
           if (this.#checkAnswer(pair)) {
             pair.score++;
+            this.#broadcastSuccessToEmcee(this.#pairs.indexOf(pair));
             this.#broadcastStateToEmcee();
 
             // END the game if the score has reached 3
@@ -180,7 +181,14 @@ export class MissionTwo extends AbstractMission {
   }
 
   /**
-   * @param {any} pairNumber
+   * @param {number} pairNumber
+   */
+  #broadcastSuccessToEmcee(pairNumber) {
+    this.emcee.emit('submitAnswerSuccess', pairNumber);
+  }
+
+  /**
+   * @param {number} pairNumber
    */
   #broadcastFailureToEmcee(pairNumber) {
     this.emcee.emit('submitAnswerFail', pairNumber);
@@ -188,11 +196,6 @@ export class MissionTwo extends AbstractMission {
 
   wrap_up() {
     clearInterval(this.broadcastRoleInterval);
-
-    // const winnerNumbers =
-    //   this.#pairs[0] > this.#pairs[1]
-    //     ? [this.#pairs[0].solverNumber, this.#pairs[0].guiderNumber]
-    //     : [this.#pairs[1].solverNumber, this.#pairs[1].guiderNumber];
 
     let winnerNumbers;
 
