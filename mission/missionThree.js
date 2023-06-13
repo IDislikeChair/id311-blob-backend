@@ -1,11 +1,14 @@
 import { AbstractMission } from '../abstractMission.js';
 import { GameFlowMgr } from '../gameFlowMgr.js';
 
-class targetDummy {
+class TargetDummy {
   // TODO: Find good distance between target and position.
   // this is in percentage.
   #SHOOTING_DISTANCE = 5;
 
+  /**
+   * @param {number} victimNumber
+   */
   constructor(victimNumber) {
     this.victimNumber = victimNumber;
     this.victimHealthPoint = 5;
@@ -43,7 +46,7 @@ export class MissionThree extends AbstractMission {
   /** @type {number[]} */
   #alivePlayerNumbers;
 
-  /** @type {Object.<number, targetDummy>} */
+  /** @type {Object.<number, TargetDummy>} */
   #targetDummies;
 
   /**
@@ -62,10 +65,10 @@ export class MissionThree extends AbstractMission {
 
     // (2) Create target for each player with the victim being the other.
     this.#targetDummies = {};
-    this.#targetDummies[this.#alivePlayerNumbers[0]] = new targetDummy(
+    this.#targetDummies[this.#alivePlayerNumbers[0]] = new TargetDummy(
       this.#alivePlayerNumbers[1]
     );
-    this.#targetDummies[this.#alivePlayerNumbers[1]] = new targetDummy(
+    this.#targetDummies[this.#alivePlayerNumbers[1]] = new TargetDummy(
       this.#alivePlayerNumbers[0]
     );
 
