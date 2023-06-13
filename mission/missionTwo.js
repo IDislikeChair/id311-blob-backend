@@ -196,12 +196,12 @@ export class MissionTwo extends AbstractMission {
 
     let winnerNumbers;
 
-    if (this.#pairs[0].lives <= 0)
+    if (this.#pairs[0].lifeLeft <= 0)
       winnerNumbers = [
         this.#pairs[1].solverNumber,
         this.#pairs[1].guiderNumber,
       ];
-    else if (this.#pairs[1].lives <= 0)
+    else if (this.#pairs[1].lifeLeft <= 0)
       winnerNumbers = [
         this.#pairs[0].solverNumber,
         this.#pairs[0].guiderNumber,
