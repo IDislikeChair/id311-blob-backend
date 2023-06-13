@@ -1,41 +1,50 @@
 import { AbstractMission } from '../abstractMission.js';
 import { GameFlowMgr } from '../gameFlowMgr.js';
 
-class TargetDummy {
-  #MAX_HEALTH_POINT = 10;
+class targetDummy {
+  // TODO: Find good distance between target and position.
+  // this is in percentage.
+  #SHOOTING_DISTANCE = 5;
 
-  constructor(playerNumber) {
-    this.playerNumber = playerNumber;
-    this.healthPoint = this.#MAX_HEALTH_POINT;
+  constructor(victimNumber) {
+    this.victimNumber = victimNumber;
+    this.victimHealthPoint = 5;
+
+    this.cursorPosition = { x: 50, y: 50 };
+    this.cursorMomentum = { x: 0, y: 0 };
+
+    this.targetPosition = { x: NaN, y: NaN };
+    this.generateNewTargetPosition();
   }
 
-  get_remaining_health_ratio() {
-    return this.healthPoint / this.#MAX_HEALTH_POINT;
+  generateNewTargetPosition() {
+    // generate uniform random position between 0-99.
+    this.targetPosition = {
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+    };
   }
-}
 
-class Target {
-  /**
-   *
-   * @param {number} x
-   * @param {number} y
-   */
-  constructor(counterId) {
-    this.whom = counterId;
-    this.x = 50;
-    this.y = 50;
-    this.target = { x: 50, y: 50 };
+  is_cursor_within_target_distance() {
+    const dx = this.cursorPosition.x - this.targetPosition.x;
+    const dy = this.cursorPosition.y - this.targetPosition.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    return distance <= this.#SHOOTING_DISTANCE;
   }
 }
 
 export class MissionThree extends AbstractMission {
-  #MOVE_RATE = 1;
+  /** @type {number} in milliseconds */
+  #GAME_TICK_TIME = 33;
+
+  /** @type {number} */
+  #MOVE_RATE = this.#GAME_TICK_TIME / 200;
 
   /** @type {number[]} */
   #alivePlayerNumbers;
 
-  /** @type {Target[]} */
-  #target;
+  /** @type {Object.<number, targetDummy>} */
+  #targetDummies;
 
   /**
    * @param {GameFlowMgr} gameFlowMgr
@@ -43,6 +52,7 @@ export class MissionThree extends AbstractMission {
   constructor(gameFlowMgr) {
     super(gameFlowMgr);
 
+    // (1) Get the list of alive players from previous missions.
     this.#alivePlayerNumbers = [];
     for (let i = 0; i < 6; i++) {
       if (this.playerMgr.is_player_alive(i)) {
@@ -50,59 +60,73 @@ export class MissionThree extends AbstractMission {
       }
     }
 
-    this.#target = {};
-    this.#target[this.#alivePlayerNumbers[0]] = new Target(
+    // (2) Create target for each player with the victim being the other.
+    this.#targetDummies = {};
+    this.#targetDummies[this.#alivePlayerNumbers[0]] = new targetDummy(
       this.#alivePlayerNumbers[1]
     );
-    this.#target[this.#alivePlayerNumbers[1]] = new Target(
+    this.#targetDummies[this.#alivePlayerNumbers[1]] = new targetDummy(
       this.#alivePlayerNumbers[0]
     );
 
+    // (3) Set interval for movement tick and Emcee broadcast.
+    this.movementTickInterval = setInterval(() => {
+      this.#calc_movement_tick();
+    }, this.#GAME_TICK_TIME);
+
     this.broadcastPairInterval = setInterval(() => {
-      this.#broadcastStateToEmcee();
+      this.#broadcast_state_to_emcee();
     }, 100);
 
+    // (4) Set up listeners  for player input.
     for (let playerNum of this.#alivePlayerNumbers) {
       this.playerMgr.on_player(
         playerNum,
         'sendAcceleration',
-        (xAcceleration, yAcceleration) => {
-          this.#target[playerNum].x += xAcceleration * this.#MOVE_RATE;
-          this.#target[playerNum].y += yAcceleration * this.#MOVE_RATE;
-          if (this.#target[playerNum].x < 0) this.#target[playerNum].x = 0;
-          if (this.#target[playerNum].x > 99) this.#target[playerNum].x = 99;
-          if (this.#target[playerNum].y < 0) this.#target[playerNum].y = 0;
-          if (this.#target[playerNum].y > 99) this.#target[playerNum].y = 99;
-
-          console.log(
-            'got acceleration from',
-            playerNum,
-            xAcceleration,
-            yAcceleration
-          );
+        (
+          /** @type {number} */ xAcceleration,
+          /** @type {number} */ yAcceleration
+        ) => {
+          this.#targetDummies[0].cursorMomentum.x += xAcceleration;
+          this.#targetDummies[0].cursorMomentum.y += yAcceleration;
         }
       );
 
       this.playerMgr.on_player(playerNum, 'submitShot', () => {
-        console.log('submitShot', playerNum, this.#target[playerNum]);
-        if (this.#checkShot(pair)) {
-          //
+        console.log('submitShot', playerNum, this.#targetDummies[playerNum]);
+        if (this.#targetDummies[playerNum].is_cursor_within_target_distance()) {
+          this.#targetDummies[playerNum].victimHealthPoint -= 1;
+          this.emcee.emit('shotSuccess', playerNum);
         } else {
-          //
+          this.emcee.emit('shotFail', playerNum);
         }
+
+        this.#broadcast_state_to_emcee();
       });
     }
   }
 
-  /**
-   * @param {Target} target
-   */
-  #checkShot(target) {
-    return false;
+  #calc_movement_tick() {
+    for (let targetDummy of [
+      this.#targetDummies[this.#alivePlayerNumbers[0]],
+      this.#targetDummies[this.#alivePlayerNumbers[1]],
+    ]) {
+      // recalculate position by target's momentum.
+      targetDummy.cursorPosition.x +=
+        targetDummy.cursorMomentum.x * this.#MOVE_RATE;
+      targetDummy.cursorPosition.y +=
+        targetDummy.cursorMomentum.y * this.#MOVE_RATE;
+
+      // limit range to from 0 to 99.
+      if (targetDummy.cursorPosition.x < 0) targetDummy.cursorPosition.x = 0;
+      if (targetDummy.cursorPosition.x > 99) targetDummy.cursorPosition.x = 99;
+      if (targetDummy.cursorPosition.y < 0) targetDummy.cursorPosition.y = 0;
+      if (targetDummy.cursorPosition.y > 99) targetDummy.cursorPosition.y = 99;
+    }
   }
 
-  #broadcastStateToEmcee() {
-    this.emcee.emit('broadcastState', this.#target);
+  #broadcast_state_to_emcee() {
+    this.emcee.emit('broadcastState', this.#targetDummies);
   }
 
   wrap_up() {}
