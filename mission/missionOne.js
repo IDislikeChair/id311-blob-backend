@@ -61,8 +61,11 @@ export class MissionOne extends AbstractMission {
 
     // Set the rest of players dead.
     for (let playerNumber = 0; playerNumber < 6; playerNumber++) {
-      if (!this.winnerNumbers.includes(playerNumber)) {
-        this.playerMgr.set_player_dead(playerNumber);
+      if (
+        !this.winnerNumbers.includes(playerNumber) &&
+        this.playerMgr.is_player_alive(playerNumber)
+      ) {
+        this.playerMgr.set_player_dead(playerNumber, 1);
       }
     }
 
