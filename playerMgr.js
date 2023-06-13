@@ -16,9 +16,7 @@ export class PlayerMgr {
    */
   start_pre_mission(missionId) {
     for (const player of this.#players) {
-      //   if (player.is_alive()) {
       player.start_pre_mission(missionId);
-      //   }
     }
   }
 
@@ -27,9 +25,7 @@ export class PlayerMgr {
    */
   start_mission(missionId) {
     for (const player of this.#players) {
-      //   if (player.is_alive()) {
       player.start_mission(missionId);
-      //   }
     }
   }
 
@@ -38,9 +34,7 @@ export class PlayerMgr {
    */
   start_post_mission(missionId) {
     for (const player of this.#players) {
-      //   if (player.is_alive()) {
       player.start_post_mission(missionId);
-      //   }
     }
   }
 
@@ -94,9 +88,9 @@ export class PlayerMgr {
   /**
    * @param {number} playerNumber
    */
-  set_player_dead(playerNumber) {
+  set_player_dead(playerNumber, mission_id) {
     if (this.#players[playerNumber]) {
-      this.#players[playerNumber].set_dead();
+      this.#players[playerNumber].set_dead(mission_id);
     }
   }
 
@@ -189,7 +183,7 @@ export class PlayerMgr {
     return this.#players.map((player) => ({
       pNum: player.get_number(),
       pName: player.get_name(),
-      alive: player.is_alive(),
+      alive: player.get_progress(),
     }));
   }
 

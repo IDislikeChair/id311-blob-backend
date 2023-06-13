@@ -29,6 +29,10 @@ export class Player {
 
   /** @returns {boolean} */
   is_alive() {
+    return this.#isAlive == 0;
+  }
+
+  get_progress() {
     return this.#isAlive;
   }
 
@@ -38,11 +42,11 @@ export class Player {
   }
 
   set_alive() {
-    this.#isAlive = true;
+    this.#isAlive = 0;
   }
 
-  set_dead() {
-    this.#isAlive = false;
+  set_dead(mission_id) {
+    this.#isAlive = mission_id;
   }
 
   /**
@@ -59,7 +63,7 @@ export class Player {
     this.#playerNumber = playerNumber;
     this.#playerMgr = playerMgr;
 
-    this.#isAlive = true;
+    this.#isAlive = 0;
   }
 
   // Public methods

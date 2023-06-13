@@ -20,7 +20,8 @@ class Target {
    * @param {number} x
    * @param {number} y
    */
-  constructor() {
+  constructor(counterId) {
+    this.whom = counterId;
     this.x = 50;
     this.y = 50;
     this.target = { x: 50, y: 50 };
@@ -50,8 +51,16 @@ export class MissionThree extends AbstractMission {
     }
 
     this.#target = {};
-    this.#target[this.#alivePlayerNumbers[0]] = new Target();
-    this.#target[this.#alivePlayerNumbers[1]] = new Target();
+    this.#target[this.#alivePlayerNumbers[0]] = new Target(
+      this.#alivePlayerNumbers[1]
+    );
+    this.#target[this.#alivePlayerNumbers[1]] = new Target(
+      this.#alivePlayerNumbers[0]
+    );
+
+    this.broadcastPairInterval = setInterval(() => {
+      this.#broadcastStateToEmcee();
+    }, 100);
 
     for (let playerNum of this.#alivePlayerNumbers) {
       this.playerMgr.on_player(
@@ -71,7 +80,6 @@ export class MissionThree extends AbstractMission {
             xAcceleration,
             yAcceleration
           );
-          this.#broadcastStateToEmcee();
         }
       );
 

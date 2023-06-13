@@ -133,7 +133,7 @@ export class GameFlowMgr {
       ) {
         this.on_next();
       }
-    }, 10 * 1000 + (missionId == 3 ? 200000000 : 0));
+    }, 2 * 60 * 1000 + (missionId == 3 ? 200000000 : 0));
   }
 
   /**
