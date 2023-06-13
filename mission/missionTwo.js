@@ -214,7 +214,7 @@ export class MissionTwo extends AbstractMission {
 
     // Set the rest of players dead.
     for (let playerNumber = 0; playerNumber < 6; playerNumber++) {
-      if (!winnerNumbers.include(playerNumber)) {
+      if (!winnerNumbers.includes(playerNumber)) {
         this.playerMgr.set_player_dead(playerNumber);
       }
     }
