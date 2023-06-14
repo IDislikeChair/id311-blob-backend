@@ -90,8 +90,8 @@ export class MissionThree extends AbstractMission {
           /** @type {number} */ xAcceleration,
           /** @type {number} */ yAcceleration
         ) => {
-          this.#targetDummies[0].cursorMomentum.x += xAcceleration;
-          this.#targetDummies[0].cursorMomentum.y += yAcceleration;
+          this.#targetDummies[0].cursorMomentum.x = xAcceleration;
+          this.#targetDummies[0].cursorMomentum.y = yAcceleration;
         }
       );
 
