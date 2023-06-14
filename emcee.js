@@ -1,7 +1,7 @@
-import { Client } from './client.js';
-import { Session } from './session.js';
+import Client from './client.js';
+import Session from './session.js';
 
-export class Emcee {
+export default class Emcee {
   /** @type {Client} */
   #client;
 
@@ -20,11 +20,7 @@ export class Emcee {
 
     // setup on next message
     this.#client.on('on_next', () => {
-      this.#session.on_next();
-    });
-
-    this.#client.on('DEBUG_go_to_pre_mission', (id) => {
-      this.#session.get_game_flow_mgr().DEBUG_go_to_pre_mission(id);
+      this.#session.go_to_next_scene();
     });
   }
 

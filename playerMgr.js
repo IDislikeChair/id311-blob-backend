@@ -1,7 +1,8 @@
-import { Client } from './client.js';
-import { FakePlayer, Player } from './player.js';
+import Client from './client.js';
+import FakePlayer from './fakePlayer.js';
+import Player from './player.js';
 
-export class PlayerMgr {
+export default class PlayerMgr {
   /** @type {Player[]} */
   #players;
 
@@ -81,12 +82,9 @@ export class PlayerMgr {
     this.#players = this.#players.filter((p) => p !== player);
   }
 
-  get_player_count() {
-    return this.#players.length;
-  }
-
   /**
    * @param {number} playerNumber
+   * @param {number} mission_id
    */
   set_player_dead(playerNumber, mission_id) {
     if (this.#players[playerNumber]) {
@@ -106,12 +104,12 @@ export class PlayerMgr {
 
   /**
    * @param {string} event
-   * @param {(playerNumber: number, message: any) => void} callback
+   * @param {(playerNumber: number, message: any) => void} handler
    */
-  on_any_player(event, callback) {
+  on_any_player(event, handler) {
     for (const player of this.#players) {
       player.on(event, (/** @type {any} */ individual_message) =>
-        callback(player.get_number(), individual_message)
+        handler(player.get_number(), individual_message)
       );
     }
   }
@@ -130,13 +128,13 @@ export class PlayerMgr {
 
   /**
    * @param {string} event
-   * @param {(playerNumber: number, message: any) => void} callback
+   * @param {(playerNumber: number, message: any) => void} handler
    */
-  on_any_alive_player(event, callback) {
+  on_any_alive_player(event, handler) {
     for (const player of this.#players) {
       if (player.is_alive()) {
         player.on(event, (/** @type {any} */ individual_message) =>
-          callback(player.get_number(), individual_message)
+          handler(player.get_number(), individual_message)
         );
       }
     }

@@ -11,7 +11,7 @@ import SOCKET_MGR from './socketMgr.js';
  * Class for controlling socket instance, and setting up common listeners.
  * Client must be set up with an owner, which implements IClientOwner.
  */
-export class Client {
+export default class Client {
   /** @type {IClientOwner} */
   #owner;
 
@@ -70,29 +70,4 @@ export class Client {
       socket.disconnect();
     }
   }
-}
-
-export class FakeClient extends Client {
-  constructor() {
-    super('FAKE_SOCKET');
-  }
-
-  /**
-   * @param {IClientOwner} _owner
-   */
-  setOwner(_owner) {}
-
-  /**
-   * @param {any} _event
-   * @param {any[]} _args
-   */
-  emit(_event, ..._args) {}
-
-  /**
-   * @param {any} _event
-   * @param {any[]} _args
-   */
-  on(_event, ..._args) {}
-
-  disconnect() {}
 }

@@ -1,9 +1,7 @@
-import { AbstractMission } from '../abstractMission.js';
-import { GameFlowMgr } from '../gameFlowMgr.js';
+import AbstractMission from '../abstractMission.js';
+import GameFlowMgr from '../gameFlowMgr.js';
 
 class TargetDummy {
-  // TODO: Find good distance between target and position.
-  // this is in percentage.
   #SHOOTING_DISTANCE = 15;
 
   /**
@@ -36,7 +34,7 @@ class TargetDummy {
   }
 }
 
-export class MissionThree extends AbstractMission {
+export default class MissionThree extends AbstractMission {
   /** @type {number} in milliseconds */
   #GAME_TICK_TIME = 33;
 
@@ -86,24 +84,20 @@ export class MissionThree extends AbstractMission {
       this.playerMgr.on_player(
         playerNum,
         'sendAcceleration',
-        (
-          /** @type {number} */ xAcceleration,
-          /** @type {number} */ yAcceleration
-        ) => {
-          this.#targetDummies[playerNum].cursorMomentum.x = xAcceleration;
-          this.#targetDummies[playerNum].cursorMomentum.y = yAcceleration;
+        (/** @type {number} */ xSpeed, /** @type {number} */ ySpeed) => {
+          this.#targetDummies[playerNum].cursorMomentum.x = xSpeed;
+          this.#targetDummies[playerNum].cursorMomentum.y = ySpeed;
         }
       );
 
       this.playerMgr.on_player(playerNum, 'submitShot', () => {
-        console.log('submitShot', playerNum, this.#targetDummies[playerNum]);
         if (this.#targetDummies[playerNum].is_cursor_within_target_distance()) {
           this.#targetDummies[playerNum].victimHealthPoint -= 1;
           this.#targetDummies[playerNum].generateNewTargetPosition();
           this.emcee.emit('shotSuccess', playerNum);
 
           if (this.#targetDummies[playerNum].victimHealthPoint <= 0) {
-            this.gameFlowMgr.on_next();
+            this.gameFlowMgr.go_to_next_scene();
           }
         } else {
           this.emcee.emit('shotFail', playerNum);
@@ -141,7 +135,6 @@ export class MissionThree extends AbstractMission {
     clearInterval(this.movementTickInterval);
     clearInterval(this.broadcastPairInterval);
 
-    // set playerNum with less health to be dead.
     if (
       this.#targetDummies[this.#alivePlayerNumbers[0]].victimHealthPoint >
       this.#targetDummies[this.#alivePlayerNumbers[1]].victimHealthPoint

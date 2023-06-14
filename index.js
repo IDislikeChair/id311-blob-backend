@@ -1,5 +1,5 @@
-import { SessionMgr } from './sessionMgr.js';
-import { Client } from './client.js';
+import SessionMgr from './sessionMgr.js';
+import Client from './client.js';
 import SOCKET_MGR from './socketMgr.js';
 
 const sessionMgr = new SessionMgr();
@@ -13,7 +13,6 @@ SOCKET_MGR.get_io().on('connection', (socket) => {
     switch (msg.role) {
       case 0:
         const emcee = new Client(socket.id);
-        console.log(socket.id);
 
         const new_session = sessionMgr.create_new_session();
 

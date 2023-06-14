@@ -1,6 +1,6 @@
-import { GameFlowMgr } from './gameFlowMgr.js';
+import GameFlowMgr from './gameFlowMgr.js';
 
-export class AbstractMission {
+export default class AbstractMission {
   /**
    * @param {GameFlowMgr} gameFlowMgr
    */

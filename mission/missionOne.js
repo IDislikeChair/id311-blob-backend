@@ -1,7 +1,7 @@
-import { AbstractMission } from '../abstractMission.js';
-import { GameFlowMgr } from '../gameFlowMgr.js';
+import AbstractMission from '../abstractMission.js';
+import GameFlowMgr from '../gameFlowMgr.js';
 
-export class MissionOne extends AbstractMission {
+export default class MissionOne extends AbstractMission {
   #MAX_WINNER_COUNT = 4;
 
   /** @type {number[]} */
@@ -39,7 +39,7 @@ export class MissionOne extends AbstractMission {
           !this.#is_done
         ) {
           this.#is_done = true;
-          this.gameFlowMgr.on_next();
+          this.gameFlowMgr.go_to_next_scene();
         }
       }
     );
@@ -68,9 +68,5 @@ export class MissionOne extends AbstractMission {
         this.playerMgr.set_player_dead(playerNumber, 1);
       }
     }
-
-    console.log(
-      `MissionOne.wrap_up: Winners from this round are ${this.winnerNumbers}`
-    );
   }
 }

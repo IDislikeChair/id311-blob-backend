@@ -1,5 +1,5 @@
-import { AbstractMission } from '../abstractMission.js';
-import { GameFlowMgr } from '../gameFlowMgr.js';
+import AbstractMission from '../abstractMission.js';
+import GameFlowMgr from '../gameFlowMgr.js';
 
 class MissionTwoPair {
   /**
@@ -23,7 +23,7 @@ class MissionTwoPair {
   }
 }
 
-export class MissionTwo extends AbstractMission {
+export default class MissionTwo extends AbstractMission {
   #MOVE_RATE = 1;
 
   /** @type {number[]} */
@@ -72,14 +72,13 @@ export class MissionTwo extends AbstractMission {
 
     // (2a) Send the score to TV.
     this.broadcastPairInterval = setInterval(() => {
-      this.#broadcastStateToEmcee();
+      this.#broadcast_state_to_emcee();
     }, 100);
     this.emcee.on('gotPairs', () => {
       clearInterval(this.broadcastPairInterval);
     });
 
     // (3) Initialize each player's role.
-    // TODO: Find a better solution that this crap.
     this.broadcastRoleInterval = setInterval(() => {
       for (let pair of this.#pairs) {
         this.playerMgr.emit_to_player(pair.solverNumber, 'missionTwoRole', 0);
@@ -109,10 +108,10 @@ export class MissionTwo extends AbstractMission {
           if (pair.lockState < 0) pair.lockState = 0;
           if (pair.lockState > 99) pair.lockState = 99;
 
-          if (this.#checkAnswer(pair)) {
+          if (this.#check_answer(pair)) {
             this.playerMgr.emit_to_player(pair.guiderNumber, 'alertAnswer');
           }
-          this.#broadcastStateToEmcee();
+          this.#broadcast_state_to_emcee();
         }
       );
 
@@ -123,18 +122,18 @@ export class MissionTwo extends AbstractMission {
         pair.solverNumber,
         'submitAnswer',
         (/** @type {number} */ answer) => {
-          if (this.#checkAnswer(pair)) {
+          if (this.#check_answer(pair)) {
             pair.score++;
-            this.#broadcastSuccessToEmcee(this.#pairs.indexOf(pair));
-            this.#broadcastStateToEmcee();
+            this.#broadcast_success_to_emcee(this.#pairs.indexOf(pair));
+            this.#broadcast_state_to_emcee();
 
             // END the game if the score has reached 3
-            if (pair.score === 3) this.gameFlowMgr.on_next();
+            if (pair.score === 3) this.gameFlowMgr.go_to_next_scene();
           } else {
-            this.#broadcastFailureToEmcee(this.#pairs.indexOf(pair));
+            this.#broadcast_failure_to_emcee(this.#pairs.indexOf(pair));
             pair.lifeLeft -= 1;
 
-            if (pair.lifeLeft <= 0) this.gameFlowMgr.on_next();
+            if (pair.lifeLeft <= 0) this.gameFlowMgr.go_to_next_scene();
           }
 
           this.playerMgr.emit_to_player(
@@ -157,11 +156,11 @@ export class MissionTwo extends AbstractMission {
   /**
    * @param {MissionTwoPair} pair
    */
-  #checkAnswer(pair) {
+  #check_answer(pair) {
     return Math.floor(pair.lockState / 20) === pair.answer;
   }
 
-  #broadcastStateToEmcee() {
+  #broadcast_state_to_emcee() {
     this.emcee.emit('broadcastMission2State', [
       {
         solverNumber: this.#pairs[0].solverNumber,
@@ -183,14 +182,14 @@ export class MissionTwo extends AbstractMission {
   /**
    * @param {number} pairNumber
    */
-  #broadcastSuccessToEmcee(pairNumber) {
+  #broadcast_success_to_emcee(pairNumber) {
     this.emcee.emit('submitAnswerSuccess', pairNumber);
   }
 
   /**
    * @param {number} pairNumber
    */
-  #broadcastFailureToEmcee(pairNumber) {
+  #broadcast_failure_to_emcee(pairNumber) {
     this.emcee.emit('submitAnswerFail', pairNumber);
   }
 
@@ -224,9 +223,5 @@ export class MissionTwo extends AbstractMission {
         this.playerMgr.set_player_dead(playerNumber, 2);
       }
     }
-
-    console.log(
-      `MissionTwo.wrap_up: Winners from this round are ${winnerNumbers}`
-    );
   }
 }

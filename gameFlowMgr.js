@@ -1,10 +1,10 @@
-import { AbstractMission } from './abstractMission.js';
-import { MissionOne } from './mission/missionOne.js';
-import { MissionThree } from './mission/missionThree.js';
-import { MissionTwo } from './mission/missionTwo.js';
-import { Session } from './session.js';
+import AbstractMission from './abstractMission.js';
+import MissionOne from './mission/missionOne.js';
+import MissionThree from './mission/missionThree.js';
+import MissionTwo from './mission/missionTwo.js';
+import Session from './session.js';
 
-export class GameFlowMgr {
+export default class GameFlowMgr {
   static GAME_STATE = {
     START: 0,
     PRE_MISSION_1: 1,
@@ -41,9 +41,7 @@ export class GameFlowMgr {
     this.#state = GameFlowMgr.GAME_STATE.START;
   }
 
-  on_next() {
-    console.log('GameFlowMgr.on_next: previous state = ' + this.#state);
-
+  go_to_next_scene() {
     if (this.#state === GameFlowMgr.GAME_STATE.END) {
       this.#session.end_session();
     } else {
@@ -88,8 +86,6 @@ export class GameFlowMgr {
       default:
         throw new Error('Invalid game state: ' + this.#state);
     }
-
-    console.log('GameFlowMgr.on_next: current state = ' + this.#state);
   }
 
   // Private methods
@@ -131,7 +127,7 @@ export class GameFlowMgr {
         (this.#state === GameFlowMgr.GAME_STATE.MISSION_2 && missionId === 2) ||
         (this.#state === GameFlowMgr.GAME_STATE.MISSION_3 && missionId === 3)
       ) {
-        this.on_next();
+        this.go_to_next_scene();
       }
     }, 2 * 60 * 1000 + (missionId == 3 ? 200000000 : 0));
   }

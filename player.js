@@ -1,7 +1,7 @@
-import { Client, FakeClient } from './client.js';
-import { PlayerMgr } from './playerMgr.js';
+import Client from './client.js';
+import PlayerMgr from './playerMgr.js';
 
-export class Player {
+export default class Player {
   /** @type {PlayerMgr} */
   #playerMgr;
 
@@ -24,16 +24,17 @@ export class Player {
     return this.#playerNumber;
   }
 
-  /** @type {boolean} */
-  #isAlive;
+  /** @type {number} */
+  #missionDiedIn;
 
   /** @returns {boolean} */
   is_alive() {
-    return this.#isAlive == 0;
+    return this.#missionDiedIn === 0;
   }
 
+  /** @returns {number} */
   get_progress() {
-    return this.#isAlive;
+    return this.#missionDiedIn;
   }
 
   /** @returns {boolean} */
@@ -41,12 +42,11 @@ export class Player {
     return !this.is_alive();
   }
 
-  set_alive() {
-    this.#isAlive = 0;
-  }
-
+  /**
+   * @param {number} mission_id
+   */
   set_dead(mission_id) {
-    this.#isAlive = mission_id;
+    this.#missionDiedIn = mission_id;
   }
 
   /**
@@ -63,7 +63,7 @@ export class Player {
     this.#playerNumber = playerNumber;
     this.#playerMgr = playerMgr;
 
-    this.#isAlive = 0;
+    this.#missionDiedIn = 0;
   }
 
   // Public methods
@@ -84,7 +84,7 @@ export class Player {
   }
 
   /**
-   * @param {any} missionId
+   * @param {number} missionId
    */
   start_post_mission(missionId) {
     // Force mission to end.
@@ -102,7 +102,7 @@ export class Player {
   }
 
   /**
-   * @param {any} event
+   * @param {string} event
    * @param {any[]} args
    */
   emit(event, ...args) {
@@ -119,54 +119,5 @@ export class Player {
 
   // Interface methods
 
-  on_client_disconnect() {
-    this.#playerMgr.remove_player(this);
-  }
-}
-
-export class FakePlayer extends Player {
-  /**
-   * @param {number} playerNumber
-   * @param {PlayerMgr} playerMgr
-   */
-  constructor(playerNumber, playerMgr) {
-    super(
-      new FakeClient(),
-      FakePlayer.#get_random_name() + '🤖',
-      playerNumber,
-      playerMgr
-    );
-  }
-
-  static #get_random_name() {
-    const names = [
-      'Alan',
-      'Bill',
-      'Carl',
-      'Dave',
-      'Emmy',
-      'Fran',
-      'Guts',
-      'Hank',
-      'Ivan',
-      'Jake',
-      'Karl',
-      'Liam',
-      'Mark',
-      'Nick',
-      'Owen',
-      'Paul',
-      'Quin',
-      'Rudy',
-      'Sean',
-      'Troy',
-      'Utah',
-      'Vern',
-      'Wade',
-      'Xing',
-      'Yuri',
-      'Zeus',
-    ];
-    return names[Math.floor(Math.random() * names.length)];
-  }
+  on_client_disconnect() {}
 }

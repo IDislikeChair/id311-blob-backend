@@ -1,9 +1,9 @@
-import { Session } from './session.js';
+import Session from './session.js';
 
 const SESSION_ID_MIN = 1000;
 const SESSION_ID_MAX = 9999;
 
-export class SessionMgr {
+export default class SessionMgr {
   /** @type {Map<number, Session>} */
   #sessions;
 

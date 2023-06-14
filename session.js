@@ -1,16 +1,11 @@
-import { Client } from './client.js';
-import { Emcee } from './emcee.js';
-import { GameFlowMgr } from './gameFlowMgr.js';
-import { PlayerMgr } from './playerMgr.js';
+import Client from './client.js';
+import Emcee from './emcee.js';
+import GameFlowMgr from './gameFlowMgr.js';
+import PlayerMgr from './playerMgr.js';
 
-export class Session {
+export default class Session {
   /** @type {number} */
   #id;
-
-  /** @returns {number} */
-  get_session_id() {
-    return this.#id;
-  }
 
   /** @type {Emcee} */
   #emcee;
@@ -34,13 +29,6 @@ export class Session {
 
   /** @type {GameFlowMgr} */
   #gameFlowMgr;
-
-  /**
-   * @returns {GameFlowMgr}
-   */
-  get_game_flow_mgr() {
-    return this.#gameFlowMgr;
-  }
 
   /**
    * @param {number} id
@@ -135,7 +123,7 @@ export class Session {
     this.#playerMgr.start_end_screen();
   }
 
-  on_next() {
-    this.#gameFlowMgr.on_next();
+  go_to_next_scene() {
+    this.#gameFlowMgr.go_to_next_scene();
   }
 }
