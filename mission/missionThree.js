@@ -143,7 +143,7 @@ export class MissionThree extends AbstractMission {
 
     // set playerNum with less health to be dead.
     if (
-      this.#targetDummies[this.#alivePlayerNumbers[0]].victimHealthPoint <
+      this.#targetDummies[this.#alivePlayerNumbers[0]].victimHealthPoint >
       this.#targetDummies[this.#alivePlayerNumbers[1]].victimHealthPoint
     ) {
       this.playerMgr.set_player_dead(this.#alivePlayerNumbers[0], 3);
