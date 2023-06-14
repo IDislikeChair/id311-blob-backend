@@ -1,6 +1,6 @@
-import FakeClient from './fakeClient';
-import Player from './player';
-import PlayerMgr from './playerMgr';
+import FakeClient from './fakeClient.js';
+import Player from './player.js';
+import PlayerMgr from './playerMgr.js';
 
 export default class FakePlayer extends Player {
   /**
