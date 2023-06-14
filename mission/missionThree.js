@@ -11,7 +11,7 @@ class TargetDummy {
    */
   constructor(victimNumber) {
     this.victimNumber = victimNumber;
-    this.victimHealthPoint = 5;
+    this.victimHealthPoint = 3;
 
     this.cursorPosition = { x: 50, y: 50 };
     this.cursorMomentum = { x: 0, y: 0 };
