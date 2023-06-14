@@ -4,7 +4,7 @@ import { GameFlowMgr } from '../gameFlowMgr.js';
 class TargetDummy {
   // TODO: Find good distance between target and position.
   // this is in percentage.
-  #SHOOTING_DISTANCE = 5;
+  #SHOOTING_DISTANCE = 13;
 
   /**
    * @param {number} victimNumber
