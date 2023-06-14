@@ -41,7 +41,7 @@ export class MissionThree extends AbstractMission {
   #GAME_TICK_TIME = 33;
 
   /** @type {number} */
-  #MOVE_RATE = (0.3 * this.#GAME_TICK_TIME) / 200;
+  #MOVE_RATE = (0.5 * this.#GAME_TICK_TIME) / 200;
 
   /** @type {number[]} */
   #alivePlayerNumbers;
