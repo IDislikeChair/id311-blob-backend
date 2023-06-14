@@ -101,6 +101,10 @@ export class MissionThree extends AbstractMission {
           this.#targetDummies[playerNum].victimHealthPoint -= 1;
           this.#targetDummies[playerNum].generateNewTargetPosition();
           this.emcee.emit('shotSuccess', playerNum);
+
+          if (this.#targetDummies[playerNum].victimHealthPoint <= 0) {
+            this.gameFlowMgr.on_next();
+          }
         } else {
           this.emcee.emit('shotFail', playerNum);
         }
@@ -133,5 +137,18 @@ export class MissionThree extends AbstractMission {
     this.emcee.emit('broadcastMission3State', this.#targetDummies);
   }
 
-  wrap_up() {}
+  wrap_up() {
+    clearInterval(this.movementTickInterval);
+    clearInterval(this.broadcastPairInterval);
+
+    // set playerNum with less health to be dead.
+    if (
+      this.#targetDummies[this.#alivePlayerNumbers[0]].victimHealthPoint <
+      this.#targetDummies[this.#alivePlayerNumbers[1]].victimHealthPoint
+    ) {
+      this.playerMgr.set_player_dead(this.#alivePlayerNumbers[0], 3);
+    } else {
+      this.playerMgr.set_player_dead(this.#alivePlayerNumbers[1], 3);
+    }
+  }
 }
